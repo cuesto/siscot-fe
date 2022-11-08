@@ -1,8 +1,6 @@
 {
   "compilerOptions": {
-    "extensions": [
-      ".vue"
-    ],
+    
     "target": "es5",
     "module": "esnext",
     "baseUrl": "./",
@@ -18,5 +16,9 @@
       "dom.iterable",
       "scripthost"
     ]
-  }
+  },
+  "extensions": [
+    ".vue"
+  ],
+  "exclude": ["node_modules", "dist"]
 }

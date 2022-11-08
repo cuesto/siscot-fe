@@ -3,6 +3,8 @@ import Router from 'vue-router'
 import Login from '../views/Login.vue'
 import About from '../views/About.vue'
 import Dashboard from '../views/Dashboard.vue'
+import Quotes from '../views/Quotes.vue'
+
 import {
   getAuth,
   onAuthStateChanged,
@@ -17,6 +19,14 @@ const routes = [
     component: Login,
     meta: {
       requiresGuest: true
+    }
+  },
+  {
+    path: '/quotes',
+    name: 'quotes',
+    component: Quotes,
+    meta: {
+      requiresAuth: true
     }
   },
   {
