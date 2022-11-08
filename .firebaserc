@@ -1,0 +1,10 @@
+{
+  "projects": {
+    "default": "siscot-fe"
+  },
+  "targets": {
+    "siscot-fe": {
+      "hosting": {}
+    }
+  }
+}
