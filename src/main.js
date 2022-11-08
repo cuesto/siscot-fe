@@ -16,9 +16,14 @@ axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 
 Vue.use(VueSweetalert2);
 
-new Vue({
-  router,
-  store,
-  vuetify,
-  render: h => h(App)
-}).$mount('#app')
+let app
+auth.onAuthStateChanged(() => {
+  if (!app) {
+    app = new Vue({
+      vuetify,
+      router,
+      store,
+      render: h => h(App)
+    }).$mount('#app')
+  }
+})
