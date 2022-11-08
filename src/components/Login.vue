@@ -58,7 +58,6 @@ import {
 import {
     getFirestore,
     doc,
-    getDocs,
     setDoc,
     collection,
 } from "firebase/firestore";
@@ -107,7 +106,6 @@ export default {
                 )
                 .then((userCredential) => {
                     // Signed in
-                    //this.getProfileData();
                 })
                 .catch((error) => {
                     const errorCode = error.code;
@@ -156,14 +154,6 @@ export default {
                     this.error = errorMessage;
                 });
         },
-
-        // async getProfileData() {
-        //     getDocs(collection(db, "profiles/" + auth.currentUser.uid + "/clients"));
-
-        //     getDocs(
-        //         collection(db, "profiles/" + auth.currentUser.uid + "/campaigns")
-        //     );
-        // },
     },
 };
 </script>
