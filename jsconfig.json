@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
+    "extensions": [
+      ".vue"
+    ],
     "target": "es5",
     "module": "esnext",
     "baseUrl": "./",
