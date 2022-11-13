@@ -7,8 +7,8 @@ class InvoiceDraftModel {
     this.whsCode = "1";
     this.whsName = "";
     this.whsDisplay = "";
-    this.docDueDate = "";
-    this.docDate = "";
+    this.docDueDate = (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10);
+    this.docDate = (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10);
     this.companyKey = 0;
     this.comments = "";
     this.currency = "";
