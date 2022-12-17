@@ -8,23 +8,11 @@
                         <v-layout wrap>
                             <v-flex xs12 md5>
                                 <v-autocomplete v-model="invoiceDraftModel.cardCode" :items="businessPartners" :rules="[rules.required]" color="blue-grey lighten-2" label="Socio de Negocios" item-text="displayAutoComplete" item-value="cardCode" hint="CardCode - CardName" :loading="loadingBP"></v-autocomplete>
+                                <v-btn color="primary">
+                                    <v-icon left dark>add</v-icon>Agregar Cliente
+                                </v-btn>
                             </v-flex>
                             <v-flex xs1 md3></v-flex>
-                            <v-flex xs12 md3>
-                                <v-menu v-model="menuDocDueDate" :close-on-content-click="false" :nudge-right="40" transition="scale-transition" offset-y min-width="290px">
-                                    <template v-slot:activator="{ on }">
-                                        <v-text-field v-model="invoiceDraftModel.docDueDate" label="Fecha de contabilización" prepend-icon="event" readonly :rules="[rules.required]" v-on="on"></v-text-field>
-                                    </template>
-                                    <v-date-picker v-model="invoiceDraftModel.docDueDate" @input="menuDocDueDate = false"></v-date-picker>
-                                </v-menu>
-                            </v-flex>
-
-                            <v-flex xs12 md5>
-                                <v-select undefined v-model="invoiceDraftModel.ncfType" :items="ncfTypes" :rules="[rules.required]" color="blue-grey lighten-2" label="Tipo NCF" item-text="DisplayAutoComplete" item-value="Code" hint="Código - Nombre" :loading="loadingNCFTypes"></v-select>
-                            </v-flex>
-                            <v-flex xs1 md3>
-                                <v-select undefined v-model="Currency" :items="rates" color="blue-grey lighten-2" label="Moneda Extranjera" item-text="DisplayAutoComplete" item-value="Currency" hint="Moneda - Tasa" :loading="loadingRates"></v-select>
-                            </v-flex>
                             <v-flex xs12 md3>
                                 <v-menu v-model="menuDocDate" :close-on-content-click="false" :nudge-right="40" transition="scale-transition" offset-y min-width="290px">
                                     <template v-slot:activator="{ on }">
@@ -63,29 +51,18 @@
                                                                 </v-row>
                                                                 <v-row>
                                                                     <v-col cols="5" sm="5" md="5">
-                                                                        <v-text-field label="Precio" :rules="[rules.required]" v-model="invoiceDraftDetailModel.Price"></v-text-field>
+                                                                        <v-text-field label="Precio" prefix="RD$" type="number" :rules="[rules.required, rules.positivevalue]" v-model="invoiceDraftDetailModel.Price"></v-text-field>
                                                                     </v-col>
                                                                     <v-col cols="2" sm="2" md="2">
-                                                                        <v-text-field label="Desc. %" v-model="
+                                                                        <v-text-field label="Desc." suffix="%" :rules="[rules.positivevalue]" type="number" v-model="
                                           invoiceDraftDetailModel.Discount
                                         "></v-text-field>
                                                                     </v-col>
                                                                     <v-col cols="5" sm="5" md="5">
-                                                                        <v-text-field label="Cantidad" :rules="[rules.required]" v-model="invoiceDraftDetailModel.Qty"></v-text-field>
+                                                                        <v-text-field label="Cantidad" type="number" :rules="[rules.required, rules.positivevalue]" v-model="invoiceDraftDetailModel.Qty"></v-text-field>
                                                                     </v-col>
                                                                 </v-row>
-                                                                <v-row>
-                                                                    <v-col cols="6" sm="6" md="6">
-                                                                        <v-autocomplete v-model="
-                                          invoiceDraftDetailModel.WhsCode
-                                        " :items="warehouses" :rules="[rules.required]" color="blue-grey lighten-2" label="Almacén" item-text="displayAutoComplete" item-value="whsCode" hint="Código - Almacén" :loading="loadingWhs"></v-autocomplete>
-                                                                    </v-col>
-                                                                    <v-col cols="6" sm="6" md="6">
-                                                                        <v-autocomplete v-model="
-                                          invoiceDraftDetailModel.TaxCode
-                                        " :items="taxes" :rules="[rules.required]" color="blue-grey lighten-2" label="Impuesto" item-text="displayAutoComplete" item-value="code" hint="Impuesto" :loading="loadingTaxes"></v-autocomplete>
-                                                                    </v-col>
-                                                                </v-row>
+                                                               
                                                             </v-container>
                                                             <small>*indica campo requerido.</small>
                                                         </v-card-text>
@@ -248,6 +225,7 @@ export default {
             maskQty: "###########",
             rules: {
                 required: (value) => !!value || "Requerido.",
+                positivevalue: (value) => value >= 0 || "Solo se admiten valores positivos.",
                 email: (value) => {
                     const pattern =
                         /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
@@ -436,8 +414,7 @@ export default {
             const querySnapshot = await getDocsFromCache(collection(db, "ORTT"));
             querySnapshot.forEach((doc) => {
                 this.rates.push(doc.data());
-                if (doc.data().IsDefault)
-                    this.Currency = doc.data().Currency;
+                if (doc.data().IsDefault) this.Currency = doc.data().Currency;
             });
             this.loadingRates = false;
         },
