@@ -5,8 +5,8 @@ class InvoiceDraftDetailModel {
     this.ItemCode = "";
     this.ItemName = "";
     this.WhsCode = "";
-    this.Qty = 1;
-    this.Price = 1;
+    this.Qty = 0;
+    this.Price = 0;
     this.Discount = 0;
     this.TaxCode = "";
     this.Tax = 0;

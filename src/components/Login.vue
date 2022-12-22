@@ -28,7 +28,7 @@
                                 <v-text-field v-model.trim="signupForm.username" label="Usuario" name="username" prepend-icon="person" type="text" :rules="[rules.required]"></v-text-field>
                                 <v-text-field v-model.trim="signupForm.email" label="Email" name="email2" prepend-icon="mail" type="text" :rules="[rules.required, rules.email]"></v-text-field>
                                 <v-text-field v-model.trim="signupForm.password" id="password" label="Contraseña" name="password2" prepend-icon="lock" type="password" :rules="[rules.required]"></v-text-field>
-                                <v-text-field v-model.trim="signupForm.company" label="Compañía" name="company" prepend-icon="storage" type="text" :rules="[rules.required]"></v-text-field>
+                                <v-select undefined v-model="signupForm.company" :items="companies" :rules="[rules.required]" color="blue-grey lighten-2" label="Compañía" prepend-icon="storage"></v-select>
                                 <v-flex class="red--text" v-if="error">{{ error }}</v-flex>
                                 <v-btn color="primary" @click="signup">Registrar</v-btn>
 
@@ -59,23 +59,24 @@ import {
     getFirestore,
     doc,
     setDoc,
-    collection,
+    collection
 } from "firebase/firestore";
 const auth = getAuth();
 const db = getFirestore(firebaseApp);
 
 export default {
     data: () => ({
+        companies: ["Iberica", "Agrodec", "Ativa", "Fibras"],
         loginForm: {
-            email: "", //"jcuesto@domex.com.do",
+            email: "", //"jcuesto@mail.com",
             password: "", //"123456",
         },
         signupForm: {
-            name: "", //"jhon",
-            username: "", //"jhcuesto",
-            email: "", //"jc@mail.com",
-            password: "", //"123456",
-            company: "", //"www.server.com",
+            name: "", 
+            username: "", 
+            email: "", 
+            password: "", 
+            company: "", 
         },
         showLoginForm: true,
         rules: {
