@@ -4,6 +4,7 @@ import Login from '../views/Login.vue'
 import About from '../views/About.vue'
 import Dashboard from '../views/Dashboard.vue'
 import Quotes from '../views/Quotes.vue'
+import Products from '../views/Products.vue'
 
 import {
   getAuth,
@@ -25,6 +26,14 @@ const routes = [
     path: '/quotes',
     name: 'quotes',
     component: Quotes,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/products',
+    name: 'products',
+    component: Products,
     meta: {
       requiresAuth: true
     }
