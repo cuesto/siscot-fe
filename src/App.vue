@@ -16,7 +16,7 @@
                         </v-list-item-icon>
                         <v-list-item-title>Cotizaciones</v-list-item-title>
                     </v-list-item>
-                    <v-list-item disabled>
+                    <v-list-item :to="{name: 'products'}">
                         <v-list-item-icon>
                             <v-icon>mdi-package-variant-closed</v-icon>
                         </v-list-item-icon>
