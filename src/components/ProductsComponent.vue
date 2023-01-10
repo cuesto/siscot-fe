@@ -22,6 +22,27 @@
               single-line
               hide-details
             ></v-text-field>
+
+            <v-dialog v-model="dialog" max-width="600px">
+              <template v-slot:activator="{ on }">
+                <v-btn color="blue" dark v-on="on">
+                  <v-icon left dark>mdi-qrcode-scan</v-icon>Escanear
+                </v-btn>
+              </template>
+              <v-card>
+                <v-card-title>
+                  <span class="headline">Escanear Código</span>
+                </v-card-title>
+                <v-card-text>
+                  <StreamBarcodeReader
+                    @decode="(a, b, c) => onDecode(a, b, c)"
+                    @loaded="() => onLoaded()"
+                  ></StreamBarcodeReader>
+                  <h2>The decoded value in QR/barcode is {{ text }}</h2>
+                  <small>*Campo requerido.</small>
+                </v-card-text>
+              </v-card>
+            </v-dialog>
             <v-spacer></v-spacer>
           </v-toolbar>
         </template>
@@ -49,18 +70,23 @@
 import { firebaseApp } from "../firebase";
 import {
   getFirestore,
-  doc,
   getDocsFromCache,
   getDocs,
-  setDoc,
-  deleteDoc,
   collection,
 } from "firebase/firestore";
+
+import { StreamBarcodeReader } from "vue-barcode-reader";
 
 const db = getFirestore(firebaseApp);
 
 export default {
+  components: {
+    StreamBarcodeReader,
+  },
   data: () => ({
+    text: "",
+    id: null,
+    dialog: false,
     products: [],
     headers: [
       {
@@ -100,7 +126,6 @@ export default {
   watch: {},
   mounted() {},
   created() {
-    // this.getClients();
     this.getProducts(false);
   },
   methods: {
@@ -118,38 +143,32 @@ export default {
       console.log("ojo");
     },
 
-    // async getClients() {
-    //     this.loadingtable = true;
-    //     this.clients = [];
-    //     const querySnapshot = await getDocsFromCache(
-    //         collection(db, "profiles/" + auth.currentUser.uid + "/clients")
-    //     );
-    //     querySnapshot.forEach((doc) => {
-    //         this.clients.push({
-    //             id: doc.data().id,
-    //             name: doc.data().name,
-    //             phone: doc.data().phone,
-    //             lastName: doc.data().lastName,
-    //             email: doc.data().email,
-    //         });
-    //     });
-    //     this.loadingtable = false;
-    // },
+    onDecode(a, b, c) {
+      console.log(a, b, c);
+      this.text = a;
+      if (this.id) clearTimeout(this.id);
+      this.id = setTimeout(() => {
+        if (this.text === a) {
+          this.text = "";
+        }
+      }, 5000);
+    },
+    onLoaded() {
+      console.log("load");
+    },
 
     async getProducts(requestData) {
       this.loadingtable = true;
       this.products = [];
       let querySnapshot;
 
-console.log(requestData)
+      console.log(requestData);
 
-      if (requestData == true) {
+      if (requestData) {
         querySnapshot = await getDocs(collection(db, "OITM"));
       } else {
         querySnapshot = await getDocsFromCache(collection(db, "OITM"));
       }
-
-      //querySnapshot = await getDocsFromCache(collection(db, "OITM"));
       querySnapshot.forEach((doc) => {
         this.products.push({
           ItemCode: doc.data().ItemCode,
