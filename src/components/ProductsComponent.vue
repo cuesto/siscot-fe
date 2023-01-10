@@ -38,8 +38,6 @@
                     @decode="(a, b, c) => onDecode(a, b, c)"
                     @loaded="() => onLoaded()"
                   ></StreamBarcodeReader>
-                  <h2>The decoded value in QR/barcode is {{ text }}</h2>
-                  <small>*Campo requerido.</small>
                 </v-card-text>
               </v-card>
             </v-dialog>
@@ -84,7 +82,6 @@ export default {
     StreamBarcodeReader,
   },
   data: () => ({
-    text: "",
     id: null,
     dialog: false,
     products: [],
@@ -144,17 +141,17 @@ export default {
     },
 
     onDecode(a, b, c) {
-      console.log(a, b, c);
-      this.text = a;
+      this.search = a;
+      this.dialog = false;
       if (this.id) clearTimeout(this.id);
       this.id = setTimeout(() => {
-        if (this.text === a) {
-          this.text = "";
+        if (this.search === a) {
+          this.search = "";
         }
       }, 5000);
     },
+    
     onLoaded() {
-      console.log("load");
     },
 
     async getProducts(requestData) {
