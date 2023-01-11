@@ -163,7 +163,7 @@
                         </v-dialog>
                       </v-toolbar>
                     </template>
-                    <template #[`item.actions`]="{ item }" v-if="!disabled">
+                    <template #[`item.options`]="{ item }" v-if="!disabled">
                       <v-icon
                         size="sm"
                         variant="outline-info"
@@ -180,6 +180,7 @@
                         >delete</v-icon
                       >
                     </template>
+
                     <template v-slot:no-data>
                       <v-btn color="primary">
                         <v-icon left dark>autorenew</v-icon>Refrescar
@@ -344,11 +345,9 @@ export default {
         },
       ],
 
-      
       menuDispatchDate: false,
       users: [],
       warehouses: [],
-
 
       ncfTypes: [],
       rates: [],
@@ -475,7 +474,7 @@ export default {
           Code: doc.data().Code,
           Name: doc.data().Name,
           Rate: doc.data().Rate,
-          displayAutoComplete: doc.data().Code + " - " + doc.data().Rate +"%",
+          displayAutoComplete: doc.data().Code + " - " + doc.data().Rate + "%",
         });
       });
       this.loadingTaxes = false;
@@ -505,14 +504,14 @@ export default {
       itemToAdd.Qty = this.quotationDetailModel.Qty;
       itemToAdd.Discount = this.quotationDetailModel.Discount;
       itemToAdd.TaxCode = this.quotationDetailModel.TaxCode;
-      
+
       //Calulate Total Line
       if (itemToAdd.Discount != undefined || itemToAdd.Discount > 0) {
         itemToAdd.Total = itemToAdd.Price * itemToAdd.Qty;
         itemToAdd.Total =
-          (itemToAdd.Total - itemToAdd.Total * (itemToAdd.Discount / 100));
+          itemToAdd.Total - itemToAdd.Total * (itemToAdd.Discount / 100);
       } else {
-        (itemToAdd.Total = itemToAdd.Price * itemToAdd.Qty);
+        itemToAdd.Total = itemToAdd.Price * itemToAdd.Qty;
       }
 
       //Calculate Tax Line
@@ -545,24 +544,49 @@ export default {
     },
 
     calculateTotals() {
-      this.quotationModel.SubTotal =
-        this.quotationModel.QuotationDetail.reduce(
-          (accum, item) => accum + item.Total,
-          0
-        );
+      this.quotationModel.SubTotal = this.quotationModel.QuotationDetail.reduce(
+        (accum, item) => accum + item.Total,
+        0
+      );
 
-      this.quotationModel.Tax =
-        this.quotationModel.QuotationDetail.reduce(
-          (accum, item) => accum + item.Tax,
-          0
-        );
+      this.quotationModel.Tax = this.quotationModel.QuotationDetail.reduce(
+        (accum, item) => accum + item.Tax,
+        0
+      );
 
       this.quotationModel.Total =
         this.quotationModel.SubTotal + this.quotationModel.Tax;
 
-      this.quotationModel.SubTotal = Number(this.quotationModel.SubTotal).toFixed(2);  
+      this.quotationModel.SubTotal = Number(
+        this.quotationModel.SubTotal
+      ).toFixed(2);
       this.quotationModel.Tax = Number(this.quotationModel.Tax).toFixed(2);
       this.quotationModel.Total = Number(this.quotationModel.Total).toFixed(2);
+    },
+
+    deleteItem(item) {
+      let deletedIndex = this.quotationModel.QuotationDetail.indexOf(item);
+      this.quotationModel.QuotationDetail.splice(deletedIndex, 1);
+      this.cleanTotals();
+      this.calculateTotals();
+    },
+
+    editItem(item) {
+      this.editedIndex =
+        this.quotationModel.QuotationDetail.indexOf(item);
+
+      this.quotationDetailModel = new QuotationDetailModel();
+
+     
+      this.ItemCode = item.ItemCode;
+      this.quotationDetailModel.ItemCode = item.ItemCode;
+      this.quotationDetailModel.ItemName = item.ItemName;
+      this.quotationDetailModel.Qty = item.Qty;
+      this.quotationDetailModel.Price = item.Price;
+      this.quotationDetailModel.TaxCode = item.TaxCode;
+      this.quotationDetailModel.Discount = item.Discount;
+
+      this.dialog = true;
     },
 
     //////////////////////
@@ -652,36 +676,6 @@ export default {
     },
 
     
-
-    editItem(item) {
-      this.editedIndex =
-        this.invoiceDraftModel.invoiceDraftDetail.indexOf(item);
-
-      this.invoiceDraftDetailModel = new InvoiceDraftDetailModel();
-
-      this.invoiceDraftDetailModel.InvoiceDraftDetailKey =
-        item.invoiceDraftDetailKey;
-      this.invoiceDraftDetailModel.InvoiceDraftKey =
-        this.invoiceDraftModel.invoiceDraftKey;
-      this.ItemCode = item.itemCode;
-      this.invoiceDraftDetailModel.ItemCode = item.itemCode;
-      this.invoiceDraftDetailModel.ItemName = item.itemName;
-      this.invoiceDraftDetailModel.WhsCode = item.whsCode;
-      this.invoiceDraftDetailModel.Qty = item.qty;
-      this.invoiceDraftDetailModel.Price = item.price;
-      this.invoiceDraftDetailModel.TaxCode = item.taxCode;
-      this.invoiceDraftDetailModel.Discount = item.discount;
-
-      this.dialog = true;
-    },
-
-    deleteItem(item) {
-      let deletedIndex =
-        this.invoiceDraftModel.invoiceDraftDetail.indexOf(item);
-      this.invoiceDraftModel.invoiceDraftDetail.splice(deletedIndex, 1);
-      this.cleanTotals();
-      this.calculateTotals();
-    },
 
     async save() {
       if (this.$refs.form.validate()) {
