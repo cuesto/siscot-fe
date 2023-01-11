@@ -304,7 +304,7 @@ import { StreamBarcodeReader } from "vue-barcode-reader";
 
 const auth = getAuth();
 const db = getFirestore(firebaseApp);
-const tipoNCFRef = collection(db, "profiles");
+const quotationRef = collection(db, "OQUT");
 
 export default {
   directives: {
@@ -395,8 +395,8 @@ export default {
           return pattern.test(value) || "Correo Inválido.";
         },
       },
-      invoiceDraftModel: new InvoiceDraftModel(),
-      invoiceDraftDetailModel: new InvoiceDraftDetailModel(),
+      // invoiceDraftModel: new InvoiceDraftModel(),
+      // invoiceDraftDetailModel: new InvoiceDraftDetailModel(),
       //whsCode: undefined,
       editedIndex: -1,
 
@@ -410,12 +410,11 @@ export default {
     this.getBusinessPartners();
     this.getItems();
     this.getTaxes();
-
-    // onAuthStateChanged(auth, (user) => {
-    //   if (user) {
-    //     this.getUserData(user.uid);
-    //   }
-    // });
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        this.getUserData(user.uid);
+      }
+    });
 
     // this.getWarehousesByUser();
     // this.loadInvoiceDraftEdit();
@@ -453,6 +452,16 @@ export default {
     // },
   },
   methods: {
+    async getUserData(uid) {
+      const userRef = doc(db, "profiles", uid);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        this.url = userSnap.data().server;
+      } else {
+        console.log("No such document!");
+      }
+    },
+
     async getBusinessPartners() {
       this.loadingBP = true;
       this.businessPartners = [];
@@ -646,7 +655,6 @@ export default {
 
     async save() {
       if (this.$refs.form.validate()) {
-
         let bp = this.businessPartners.find(
           (x) => x.CardCode == this.quotationModel.CardCode
         );
@@ -657,8 +665,31 @@ export default {
         this.quotationModel.U_Tipo_NCF = bp.U_Tipo_NCF;
         this.quotationModel.U_RNC_Ced = bp.FederalTaxID;
 
-        console.log(this.quotationModel);
+        setDoc(
+          doc(quotationRef),
+         { CardCode: this.quotationModel.CardCode}
+        )
+          .then(() => {
+            this.close();
+            this.displayNotification(
+              "success",
+              "Se realizó la operación correctamente."
+            );
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+        // .then(() => {
+        //     this.close();
 
+        // })
+        // .catch(function (error) {
+        //     console.log(error);
+        //     this.displayNotification("error", error.message);
+        // });
+        //     };
+
+        //console.log(this.quotationModel);
 
         // let me = this;
         // me.quotationModel.CreatedBy = this.$store.state.user.name;
@@ -698,7 +729,6 @@ export default {
       }
     },
 
-    //////////////////////
     async getUserData(uid) {
       const userRef = doc(db, "profiles", uid);
       const userSnap = await getDoc(userRef);
@@ -708,6 +738,23 @@ export default {
         console.log("No such document!");
       }
     },
+
+    closeDialog() {
+      this.dialog = false;
+      setTimeout(() => {
+        this.quotationDetailModel = new QuotationDetailModel();
+        this.editedIndex = -1;
+        this.ItemCode = "";
+      }, 300);
+    },
+    close() {
+      setTimeout(() => {
+        this.invoiceDraftModel = new InvoiceDraftModel();
+        this.editedIndex = -1;
+      }, 300);
+    },
+
+    //////////////////////
 
     loadInvoiceDraftEdit() {
       this.id = this.$route.params.id;
@@ -784,20 +831,6 @@ export default {
       });
     },
 
-    closeDialog() {
-      this.dialog = false;
-      setTimeout(() => {
-        this.quotationDetailModel = new QuotationDetailModel();
-        this.editedIndex = -1;
-        this.ItemCode = "";
-      }, 300);
-    },
-    close() {
-      setTimeout(() => {
-        this.invoiceDraftModel = new InvoiceDraftModel();
-        this.editedIndex = -1;
-      }, 300);
-    },
     clean() {
       this.invoiceDraftModel = new InvoiceDraftModel();
     },
