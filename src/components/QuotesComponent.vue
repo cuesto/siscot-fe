@@ -52,7 +52,7 @@
                   <v-data-table
                     :headers="headers"
                     :search="search"
-                    :items="quotationModel.QuotationDetail"
+                    :items="quotationModel.DocumentLines"
                     class="elevation-1"
                   >
                     <template v-slot:top>
@@ -106,29 +106,33 @@
                                       ></v-autocomplete>
                                     </v-col>
                                     <v-col cols="4" sm="1" md="4">
-                                      <!-- <v-btn color="blue" dark @click="showMessage">
-                                        <v-icon left dark
-                                          >mdi-qrcode-scan</v-icon
-                                        >Escanear
-                                      </v-btn> -->
-                                      <v-dialog v-model="dialogqr" max-width="600px">
-              <template v-slot:activator="{ on }">
-                <v-btn color="blue" dark v-on="on">
-                  <v-icon left dark>mdi-qrcode-scan</v-icon>Escanear
-                </v-btn>
-              </template>
-              <v-card>
-                <v-card-title>
-                  <span class="headline">Escanear Código</span>
-                </v-card-title>
-                <v-card-text>
-                  <StreamBarcodeReader
-                    @decode="(a, b, c) => onDecode(a, b, c)"
-                    @loaded="() => onLoaded()"
-                  ></StreamBarcodeReader>
-                </v-card-text>
-              </v-card>
-            </v-dialog>
+                                      <v-dialog
+                                        v-model="dialogqr"
+                                        max-width="600px"
+                                      >
+                                        <template v-slot:activator="{ on }">
+                                          <v-btn color="blue" dark v-on="on">
+                                            <v-icon left dark
+                                              >mdi-qrcode-scan</v-icon
+                                            >Escanear
+                                          </v-btn>
+                                        </template>
+                                        <v-card>
+                                          <v-card-title>
+                                            <span class="headline"
+                                              >Escanear Código</span
+                                            >
+                                          </v-card-title>
+                                          <v-card-text>
+                                            <StreamBarcodeReader
+                                              @decode="
+                                                (a, b, c) => onDecode(a, b, c)
+                                              "
+                                              @loaded="() => onLoaded()"
+                                            ></StreamBarcodeReader>
+                                          </v-card-text>
+                                        </v-card>
+                                      </v-dialog>
                                     </v-col>
                                   </v-row>
                                   <v-row>
@@ -141,7 +145,7 @@
                                           rules.required,
                                           rules.positivevalue,
                                         ]"
-                                        v-model="quotationDetailModel.Price"
+                                        v-model="quotationDetailModel.UnitPrice"
                                       ></v-text-field>
                                     </v-col>
                                     <v-col cols="5" sm="5" md="5">
@@ -152,7 +156,7 @@
                                           rules.required,
                                           rules.positivevalue,
                                         ]"
-                                        v-model="quotationDetailModel.Qty"
+                                        v-model="quotationDetailModel.Quantity"
                                       ></v-text-field>
                                     </v-col>
                                     <v-col cols="2" sm="2" md="2">
@@ -161,7 +165,9 @@
                                         suffix="%"
                                         :rules="[rules.positivevalue]"
                                         type="number"
-                                        v-model="quotationDetailModel.Discount"
+                                        v-model="
+                                          quotationDetailModel.DiscountPercent
+                                        "
                                       ></v-text-field>
                                     </v-col>
                                   </v-row>
@@ -226,16 +232,19 @@
                       <v-card class="pa-2" outlined tile>
                         <v-text-field
                           disabled
+                          prefix="RD$"
                           label="Subtotal"
                           v-model="quotationModel.SubTotal"
                         ></v-text-field>
                         <v-text-field
                           disabled
+                          prefix="RD$"
                           label="Impuestos"
                           v-model="quotationModel.Tax"
                         ></v-text-field>
                         <v-text-field
                           disabled
+                          prefix="RD$"
                           label="Total"
                           v-model="quotationModel.Total"
                         ></v-text-field>
@@ -340,12 +349,12 @@ export default {
         {
           text: "Precio",
           sortable: false,
-          value: "Price",
+          value: "UnitPrice",
         },
         {
           text: "Cantidad",
           sortable: false,
-          value: "Qty",
+          value: "Quantity",
         },
         {
           text: "Impuesto",
@@ -355,7 +364,7 @@ export default {
         {
           text: "Desc. %",
           sortable: false,
-          value: "Discount",
+          value: "DiscountPercent",
         },
         {
           text: "Total",
@@ -454,6 +463,11 @@ export default {
       querySnapshot.forEach((doc) => {
         this.businessPartners.push({
           CardCode: doc.data().CardCode,
+          CardName: doc.data().CardName,
+          Phone1: doc.data().Phone1,
+          SalesPersonCode: doc.data().SalesPersonCode,
+          FederalTaxID: doc.data().FederalTaxID,
+          U_Tipo_NCF: doc.data().U_Tipo_NCF,
           displayAutoComplete:
             doc.data().CardCode +
             " - " +
@@ -477,7 +491,7 @@ export default {
           ItemCode: doc.data().ItemCode,
           ItemName: doc.data().ItemName,
           ItmsGrpNam: doc.data().ItmsGrpNam,
-          Price: doc.data().Price.toFixed(2),
+          UnitPrice: doc.data().Price.toFixed(2),
           Quantity: doc.data().Quantity,
           displayAutoComplete:
             doc.data().ItemCode + " - " + doc.data().ItemName,
@@ -508,57 +522,63 @@ export default {
       let item = this.items.find(
         (element) => element.ItemCode === this.quotationDetailModel.ItemCode
       );
-      this.quotationDetailModel.Price = item.Price;
+      this.quotationDetailModel.UnitPrice = item.UnitPrice;
     },
 
     addItem() {
-      let item = this.items.find(
-        (element) => element.ItemCode === this.quotationDetailModel.ItemCode
-      );
-
-      let tax = this.taxes.find(
-        (element) => element.Code === this.quotationDetailModel.TaxCode
-      );
-
-      let itemToAdd = {};
-
-      itemToAdd.ItemCode = this.quotationDetailModel.ItemCode;
-      itemToAdd.ItemName = item.ItemName;
-      itemToAdd.Price = this.quotationDetailModel.Price;
-      itemToAdd.Qty = this.quotationDetailModel.Qty;
-      itemToAdd.Discount = this.quotationDetailModel.Discount;
-      itemToAdd.TaxCode = this.quotationDetailModel.TaxCode;
-
-      //Calulate Total Line
-      if (itemToAdd.Discount != undefined || itemToAdd.Discount > 0) {
-        itemToAdd.Total = itemToAdd.Price * itemToAdd.Qty;
-        itemToAdd.Total =
-          itemToAdd.Total - itemToAdd.Total * (itemToAdd.Discount / 100);
-      } else {
-        itemToAdd.Total = itemToAdd.Price * itemToAdd.Qty;
-      }
-
-      //Calculate Tax Line
-      itemToAdd.Tax = itemToAdd.Total * (tax.Rate / 100);
-
-      if (this.editedIndex > -1) {
-        let editedItem = {
-          ...this.quotationModel.QuotationDetail[this.editedIndex],
-          ...itemToAdd,
-        };
-        this.quotationModel.QuotationDetail.splice(
-          this.editedIndex,
-          1,
-          editedItem
+      if (this.$refs.formDialog.validate()) {
+        let item = this.items.find(
+          (element) => element.ItemCode === this.quotationDetailModel.ItemCode
         );
-      } else {
-        this.quotationModel.QuotationDetail.push(itemToAdd);
+
+        let tax = this.taxes.find(
+          (element) => element.Code === this.quotationDetailModel.TaxCode
+        );
+
+        let itemToAdd = {};
+
+        itemToAdd.ItemCode = this.quotationDetailModel.ItemCode;
+        itemToAdd.ItemName = item.ItemName;
+        itemToAdd.UnitPrice = this.quotationDetailModel.UnitPrice;
+        itemToAdd.Quantity = this.quotationDetailModel.Quantity;
+        itemToAdd.DiscountPercent = this.quotationDetailModel.DiscountPercent;
+        itemToAdd.TaxCode = this.quotationDetailModel.TaxCode;
+
+        //Calulate Total Line
+        if (
+          itemToAdd.DiscountPercent != undefined ||
+          itemToAdd.DiscountPercent > 0
+        ) {
+          itemToAdd.Total = itemToAdd.UnitPrice * itemToAdd.Quantity;
+          itemToAdd.Total =
+            itemToAdd.Total -
+            itemToAdd.Total * (itemToAdd.DiscountPercent / 100);
+        } else {
+          itemToAdd.Total = itemToAdd.UnitPrice * itemToAdd.Quantity;
+        }
+
+        //Calculate Tax Line
+        itemToAdd.Tax = itemToAdd.Total * (tax.Rate / 100);
+
+        if (this.editedIndex > -1) {
+          let editedItem = {
+            ...this.quotationModel.DocumentLines[this.editedIndex],
+            ...itemToAdd,
+          };
+          this.quotationModel.DocumentLines.splice(
+            this.editedIndex,
+            1,
+            editedItem
+          );
+        } else {
+          this.quotationModel.DocumentLines.push(itemToAdd);
+        }
+
+        this.cleanTotals();
+        this.calculateTotals();
+
+        this.closeDialog();
       }
-
-      this.cleanTotals();
-      this.calculateTotals();
-
-      this.closeDialog();
     },
 
     cleanTotals() {
@@ -568,12 +588,12 @@ export default {
     },
 
     calculateTotals() {
-      this.quotationModel.SubTotal = this.quotationModel.QuotationDetail.reduce(
+      this.quotationModel.SubTotal = this.quotationModel.DocumentLines.reduce(
         (accum, item) => accum + item.Total,
         0
       );
 
-      this.quotationModel.Tax = this.quotationModel.QuotationDetail.reduce(
+      this.quotationModel.Tax = this.quotationModel.DocumentLines.reduce(
         (accum, item) => accum + item.Tax,
         0
       );
@@ -589,24 +609,24 @@ export default {
     },
 
     deleteItem(item) {
-      let deletedIndex = this.quotationModel.QuotationDetail.indexOf(item);
-      this.quotationModel.QuotationDetail.splice(deletedIndex, 1);
+      let deletedIndex = this.quotationModel.DocumentLines.indexOf(item);
+      this.quotationModel.DocumentLines.splice(deletedIndex, 1);
       this.cleanTotals();
       this.calculateTotals();
     },
 
     editItem(item) {
-      this.editedIndex = this.quotationModel.QuotationDetail.indexOf(item);
+      this.editedIndex = this.quotationModel.DocumentLines.indexOf(item);
 
       this.quotationDetailModel = new QuotationDetailModel();
 
       this.ItemCode = item.ItemCode;
       this.quotationDetailModel.ItemCode = item.ItemCode;
       this.quotationDetailModel.ItemName = item.ItemName;
-      this.quotationDetailModel.Qty = item.Qty;
-      this.quotationDetailModel.Price = item.Price;
+      this.quotationDetailModel.Quantity = item.Quantity;
+      this.quotationDetailModel.UnitPrice = item.UnitPrice;
       this.quotationDetailModel.TaxCode = item.TaxCode;
-      this.quotationDetailModel.Discount = item.Discount;
+      this.quotationDetailModel.DiscountPercent = item.DiscountPercent;
 
       this.dialog = true;
     },
@@ -621,8 +641,61 @@ export default {
         }
       }, 5000);
     },
-    
-    onLoaded() {
+
+    onLoaded() {},
+
+    async save() {
+      if (this.$refs.form.validate()) {
+
+        let bp = this.businessPartners.find(
+          (x) => x.CardCode == this.quotationModel.CardCode
+        );
+
+        this.quotationModel.CardName = bp.CardName;
+        this.quotationModel.U_TelCliente = bp.Phone1;
+        this.quotationModel.SalesPersonCode = bp.SalesPersonCode;
+        this.quotationModel.U_Tipo_NCF = bp.U_Tipo_NCF;
+        this.quotationModel.U_RNC_Ced = bp.FederalTaxID;
+
+        console.log(this.quotationModel);
+
+
+        // let me = this;
+        // me.quotationModel.CreatedBy = this.$store.state.user.name;
+        // me.quotationModel.companyKey = me.$store.state.user.company;
+
+        // if (me.invoiceDraftModel.cardCode != "") {
+        //   me.invoiceDraftModel.cardName = me.businessPartners.find(
+        //     (x) => x.cardCode == me.invoiceDraftModel.cardCode
+        //   ).cardName;
+        // }
+        //   await axios
+        //     .post(
+        //       "api/InvoiceDrafts/PostInvoiceDraft",
+        //       me.invoiceDraftModel,
+        //       me.invoiceDraftModel.invoiceDraftDetail
+        //     )
+        //     .then(function (response) {
+        //       if (response.data.result == "ERROR") {
+        //         me.displayNotification("error", response.data.message);
+        //       } else {
+        //         if (me.invoiceDraftModel.invoiceDraftKey > 0) {
+        //           router.push({
+        //             name: "home",
+        //           });
+        //         }
+        //         me.close();
+        //         me.clean();
+        //         me.displayNotification(
+        //           "success",
+        //           "Se realizó la operación correctamente."
+        //         );
+        //       }
+        //     })
+        //     .catch(function (error) {
+        //       me.displayNotification("error", error.message);
+        //     });
+      }
     },
 
     //////////////////////
@@ -711,45 +784,6 @@ export default {
       });
     },
 
-    async save() {
-      if (this.$refs.form.validate()) {
-        let me = this;
-        me.invoiceDraftModel.CreatedBy = this.$store.state.user.name;
-        me.invoiceDraftModel.companyKey = me.$store.state.user.company;
-
-        if (me.invoiceDraftModel.cardCode != "") {
-          me.invoiceDraftModel.cardName = me.businessPartners.find(
-            (x) => x.cardCode == me.invoiceDraftModel.cardCode
-          ).cardName;
-        }
-        await axios
-          .post(
-            "api/InvoiceDrafts/PostInvoiceDraft",
-            me.invoiceDraftModel,
-            me.invoiceDraftModel.invoiceDraftDetail
-          )
-          .then(function (response) {
-            if (response.data.result == "ERROR") {
-              me.displayNotification("error", response.data.message);
-            } else {
-              if (me.invoiceDraftModel.invoiceDraftKey > 0) {
-                router.push({
-                  name: "home",
-                });
-              }
-              me.close();
-              me.clean();
-              me.displayNotification(
-                "success",
-                "Se realizó la operación correctamente."
-              );
-            }
-          })
-          .catch(function (error) {
-            me.displayNotification("error", error.message);
-          });
-      }
-    },
     closeDialog() {
       this.dialog = false;
       setTimeout(() => {
@@ -760,7 +794,7 @@ export default {
     },
     close() {
       setTimeout(() => {
-        this.invoiceDraftModel = Object.assign({}, this.defaultItem);
+        this.invoiceDraftModel = new InvoiceDraftModel();
         this.editedIndex = -1;
       }, 300);
     },

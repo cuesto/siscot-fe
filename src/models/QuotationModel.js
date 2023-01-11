@@ -1,35 +1,31 @@
 class QuotationModel {
     constructor() {
-      this.QuotationKey = 0;
-      this.CardCode = "";
-      this.CardName = "";
-      this.CustomerDisplay = "";
-      this.WhsCode = "1";
-      this.WhsName = "";
-      this.WhsDisplay = "";
-      this.DocDate = (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10);
-      this.Comments = "";
-      this.Currency = "";
-      this.Rate = 0;
-  
-      this.NCFType = "";
-  
-      this.SubTotal = 0;
-      this.Tax = 0;
-      this.Discount = 0;
-      this.Total = 0;
-  
-      this.QuotationDetail = [];
-  
-      this.CreatedBy = "";
-      this.ModifiedBy = "";
-      this.Created = "";
-      this.Modified = "";
-  
-  
-  
+        this.CardCode = "";
+        this.CardName = "";
+        this.DocDate = (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10);
+        this.Comments = "";
+        this.U_Tipo_NCF = "CONSUMF";
+        this.U_TelCliente = "";
+        this.SalesPersonCode = 1;
+        this.U_RNC_Ced = "";
+        this.DocEntry = "";
+        this.DocNum = "";
+        this.SubTotal = 0;
+        this.Tax = 0;
+        this.Total = 0;
+        this.DocumentLines = [];
+        this.IsTranfered = false;
+        this.Log="";
+
+
+        this.CreatedBy = "";
+        this.ModifiedBy = "";
+        this.Created = "";
+        this.Modified = "";
+
+
+
     }
-  }
-  
-  export default QuotationModel;
-  
+}
+
+export default QuotationModel;
