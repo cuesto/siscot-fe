@@ -205,12 +205,6 @@
                         >delete</v-icon
                       >
                     </template>
-
-                    <template v-slot:no-data>
-                      <v-btn color="primary">
-                        <v-icon left dark>autorenew</v-icon>Refrescar
-                      </v-btn>
-                    </template>
                   </v-data-table>
                 </v-flex>
                 <v-container>
