@@ -91,8 +91,8 @@
                               </v-card-title>
                               <v-card-text>
                                 <v-container>
-                                  <v-row>
-                                    <v-col cols="12" sm="6" md="12">
+                                  <v-row justify="end" align="center">
+                                    <v-col cols="8" sm="5" md="8">
                                       <v-autocomplete
                                         v-model="ItemCode"
                                         :items="items"
@@ -104,6 +104,31 @@
                                         hint="Código - Artículo"
                                         :loading="loadingItems"
                                       ></v-autocomplete>
+                                    </v-col>
+                                    <v-col cols="4" sm="1" md="4">
+                                      <!-- <v-btn color="blue" dark @click="showMessage">
+                                        <v-icon left dark
+                                          >mdi-qrcode-scan</v-icon
+                                        >Escanear
+                                      </v-btn> -->
+                                      <v-dialog v-model="dialogqr" max-width="600px">
+              <template v-slot:activator="{ on }">
+                <v-btn color="blue" dark v-on="on">
+                  <v-icon left dark>mdi-qrcode-scan</v-icon>Escanear
+                </v-btn>
+              </template>
+              <v-card>
+                <v-card-title>
+                  <span class="headline">Escanear Código</span>
+                </v-card-title>
+                <v-card-text>
+                  <StreamBarcodeReader
+                    @decode="(a, b, c) => onDecode(a, b, c)"
+                    @loaded="() => onLoaded()"
+                  ></StreamBarcodeReader>
+                </v-card-text>
+              </v-card>
+            </v-dialog>
                                     </v-col>
                                   </v-row>
                                   <v-row>
@@ -272,6 +297,7 @@ import {
   deleteDoc,
   collection,
 } from "firebase/firestore";
+import { StreamBarcodeReader } from "vue-barcode-reader";
 
 const auth = getAuth();
 const db = getFirestore(firebaseApp);
@@ -280,6 +306,9 @@ const tipoNCFRef = collection(db, "profiles");
 export default {
   directives: {
     mask,
+  },
+  components: {
+    StreamBarcodeReader,
   },
   data() {
     return {
@@ -292,6 +321,7 @@ export default {
       loadingItems: false,
       menuDocDate: false,
       dialog: false,
+      dialogqr: false,
 
       quotationModel: new QuotationModel(),
       quotationDetailModel: new QuotationDetailModel(),
@@ -409,15 +439,15 @@ export default {
         this.setPrice();
       },
     },
-    Currency: {
-      handler: function (newValue) {
-        this.invoiceDraftModel.currency = newValue;
-        let rate = this.rates.find(
-          (element) => element.Currency === this.invoiceDraftModel.currency
-        );
-        this.invoiceDraftModel.rate = rate.Rate;
-      },
-    },
+    // Currency: {
+    //   handler: function (newValue) {
+    //     this.invoiceDraftModel.currency = newValue;
+    //     let rate = this.rates.find(
+    //       (element) => element.Currency === this.invoiceDraftModel.currency
+    //     );
+    //     this.invoiceDraftModel.rate = rate.Rate;
+    //   },
+    // },
   },
   methods: {
     async getBusinessPartners() {
@@ -572,12 +602,10 @@ export default {
     },
 
     editItem(item) {
-      this.editedIndex =
-        this.quotationModel.QuotationDetail.indexOf(item);
+      this.editedIndex = this.quotationModel.QuotationDetail.indexOf(item);
 
       this.quotationDetailModel = new QuotationDetailModel();
 
-     
       this.ItemCode = item.ItemCode;
       this.quotationDetailModel.ItemCode = item.ItemCode;
       this.quotationDetailModel.ItemName = item.ItemName;
@@ -587,6 +615,20 @@ export default {
       this.quotationDetailModel.Discount = item.Discount;
 
       this.dialog = true;
+    },
+
+    onDecode(a, b, c) {
+      this.ItemCode = a;
+      this.dialogqr = false;
+      if (this.id) clearTimeout(this.id);
+      this.id = setTimeout(() => {
+        if (this.ItemCode === a) {
+          this.ItemCode = "";
+        }
+      }, 5000);
+    },
+    
+    onLoaded() {
     },
 
     //////////////////////
@@ -674,8 +716,6 @@ export default {
         timer: 2500,
       });
     },
-
-    
 
     async save() {
       if (this.$refs.form.validate()) {
