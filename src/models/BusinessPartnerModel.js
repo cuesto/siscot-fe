@@ -1,21 +1,21 @@
 class BusinessPartnerModel {
     constructor() {
         this.CardCode = "";
-        this.CardName = "";
-        this.Phone1= "";
-        this.EmailAddress = "";
+        this.CardName = "jhonc";
+        this.Phone1= "8096019002";
+        this.EmailAddress = "j@mail.com";
         this.CardType = "cLid";
         this.U_Tipo_NCF = "CONSUMF";
         this.U_Tipo_ID = "1";
         this.SalesPersonCode = 1;
         this.Indicator= "01";
-        this.FederalTaxID = "";
+        this.FederalTaxID = "40237723255";
         
-        this.AddressName = "";
+        this.AddressName = "Casa";
         this.AdresType = "bo_BillTo";
-        this.City = "";
-        this.Street = "";
-        this.Block="";
+        this.City = "Santo Domingo";
+        this.Street = "Nuñez";
+        this.Block="Castellana";
         
         this.IsTranfered = false;
         this.Log="";

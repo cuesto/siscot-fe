@@ -117,6 +117,41 @@
                                 ></v-select>
                               </v-col>
                             </v-row>
+                            <v-divider></v-divider>
+                            <v-row>
+                              <v-col cols="12" sm="12" md="12">
+                                <v-text-field
+                                  label="Dirección"
+                                  :rules="[rules.required]"
+                                  v-model="bpModel.AddressName"
+                                ></v-text-field>
+                              </v-col>
+                            </v-row>
+                            <v-row>
+                              <v-col cols="12" sm="12" md="12">
+                                <v-text-field
+                                  label="Calle"
+                                  :rules="[rules.required]"
+                                  v-model="bpModel.Street"
+                                ></v-text-field>
+                              </v-col>
+                            </v-row>
+                            <v-row>
+                              <v-col cols="6" sm="6" md="6">
+                                <v-text-field
+                                  label="Ciudad"
+                                  :rules="[rules.required]"
+                                  v-model="bpModel.City"
+                                ></v-text-field>
+                              </v-col>
+                              <v-col cols="6" sm="6" md="6">
+                                <v-text-field
+                                  label="Sector"
+                                  :rules="[rules.required]"
+                                  v-model="bpModel.Block"
+                                ></v-text-field>
+                              </v-col>
+                            </v-row>
                           </v-container>
                           <small>*indica campo requerido.</small>
                         </v-card-text>
@@ -128,7 +163,7 @@
                             @click="closeDialog()"
                             >Cerrar</v-btn
                           >
-                          <v-btn color="blue darken-1" text @click="addItem"
+                          <v-btn color="blue darken-1" text @click="addBP"
                             >Agregar</v-btn
                           >
                         </v-card-actions>
@@ -420,6 +455,7 @@ import { StreamBarcodeReader } from "vue-barcode-reader";
 const auth = getAuth();
 const db = getFirestore(firebaseApp);
 const quotationRef = collection(db, "OQUT");
+const businessPartnerRef = collection(db, "OCRD");
 
 export default {
   directives: {
@@ -436,8 +472,8 @@ export default {
       taxes: [],
       ncfTypes: [],
       idTypes: [],
-      indicators:[],
-      salesPersons:[],
+      indicators: [],
+      salesPersons: [],
 
       loadingBP: false,
       loadingItems: false,
@@ -499,7 +535,6 @@ export default {
         },
       ],
 
-    
       //warehouses: [],
 
       //rates: [],
@@ -539,9 +574,7 @@ export default {
       }
     });
 
-    
     // this.loadInvoiceDraftEdit();
-    
   },
   computed: {
     formTitle() {
@@ -668,14 +701,15 @@ export default {
       });
     },
 
-     async getIndicators() {
+    async getIndicators() {
       this.indicators = [];
       let querySnapshot;
       //querySnapshot = await getDocs(collection(db, "OIDC"));
       querySnapshot = await getDocsFromCache(collection(db, "OIDC"));
       querySnapshot.forEach((doc) => {
         this.indicators.push({
-          Code: doc.data().Code <10?"0"+doc.data().Code: ""+doc.data().Code,
+          Code:
+            doc.data().Code < 10 ? "0" + doc.data().Code : "" + doc.data().Code,
           Name: doc.data().Name,
         });
       });
@@ -754,6 +788,41 @@ export default {
         this.calculateTotals();
 
         this.closeDialog();
+      }
+    },
+
+    addBP() {
+      if (this.$refs.formDialogBP.validate()) {
+        let bp = this.businessPartners.find(
+          (x) => x.FederalTaxID == this.bpModel.FederalTaxID
+        );
+
+        if (bp != undefined) {
+          this.displayNotification(
+            "warning",
+            "Existe un socio con el mismo RNC/Cédula"
+          );
+        } else {
+
+          this.bpModel.CardCode =  Math.floor(Math.random() * (333333 - 222222 + 1) ) + 222222;
+
+          setDoc(
+            doc(businessPartnerRef),
+            JSON.parse(JSON.stringify(this.bpModel))
+          )
+            .then(() => {
+              this.closeDialog();
+              this.quotationModel.CardCode = this.bpModel.CardCode;
+              this.getBusinessPartners();
+              this.displayNotification(
+                "success",
+                "Se realizó la operación correctamente."
+              );
+            })
+            .catch(function (error) {
+              this.displayNotification("error", error.message);
+            });
+        }
       }
     },
 
@@ -850,14 +919,22 @@ export default {
     },
 
     closeDialog() {
-      this.dialog = false;
-      this.dialogqr = false;
       setTimeout(() => {
-        this.quotationDetailModel = new QuotationDetailModel();
-        this.editedIndex = -1;
-        this.ItemCode = "";
+        if (this.dialog) {
+          this.dialog = false;
+          this.dialogqr = false;
+          this.quotationDetailModel = new QuotationDetailModel();
+          this.$refs.formDialog.resetValidation();
+          this.editedIndex = -1;
+          this.ItemCode = "";
+        } else {
+          this.dialogbp = false;
+          this.bpModel = new BusinessPartnerModel();
+          this.$refs.formDialogBP.resetValidation();
+        }
       }, 300);
     },
+
     close() {
       setTimeout(() => {
         this.quotationModel = new QuotationModel();
@@ -866,6 +943,15 @@ export default {
       }, 300);
     },
 
+    displayNotification(type, message) {
+      this.$swal.fire({
+        position: "top-end",
+        type: type,
+        title: message,
+        showConfirmButton: false,
+        timer: 2500,
+      });
+    },
     //////////////////////
 
     loadInvoiceDraftEdit() {
@@ -890,17 +976,6 @@ export default {
         .catch(function (error) {
           me.displayNotification("error", error.message);
         });
-    },
-
-
-    displayNotification(type, message) {
-      this.$swal.fire({
-        position: "top-end",
-        type: type,
-        title: message,
-        showConfirmButton: false,
-        timer: 2500,
-      });
     },
   },
 };
