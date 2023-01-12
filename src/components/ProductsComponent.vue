@@ -33,7 +33,7 @@
                 <v-card-title>
                   <span class="headline">Escanear Código</span>
                 </v-card-title>
-                <v-card-text v-if="dialog">
+                <v-card-text v-if="dialog" >
                   <StreamBarcodeReader
                     @decode="(a, b, c) => onDecode(a, b, c)"
                     @loaded="() => onLoaded()"
@@ -143,12 +143,6 @@ export default {
     onDecode(a, b, c) {
       this.search = a;
       this.dialog = false;
-      if (this.id) clearTimeout(this.id);
-      this.id = setTimeout(() => {
-        if (this.search === a) {
-          this.search = "";
-        }
-      }, 5000);
     },
     
     onLoaded() {
