@@ -123,7 +123,7 @@
                                               >Escanear Código</span
                                             >
                                           </v-card-title>
-                                          <v-card-text>
+                                          <v-card-text v-if="dialogqr">
                                             <StreamBarcodeReader
                                               @decode="
                                                 (a, b, c) => onDecode(a, b, c)
@@ -395,9 +395,8 @@ export default {
           return pattern.test(value) || "Correo Inválido.";
         },
       },
-      // invoiceDraftModel: new InvoiceDraftModel(),
-      // invoiceDraftDetailModel: new InvoiceDraftDetailModel(),
-      //whsCode: undefined,
+       invoiceDraftModel: new InvoiceDraftModel(),
+      
       editedIndex: -1,
 
       disabled: false,
@@ -667,7 +666,7 @@ export default {
 
         setDoc(
           doc(quotationRef),
-         { CardCode: this.quotationModel.CardCode}
+          JSON.parse(JSON.stringify(this.quotationModel))
         )
           .then(() => {
             this.close();
@@ -677,70 +676,14 @@ export default {
             );
           })
           .catch(function (error) {
-            console.log(error);
+            this.displayNotification("error", error.message);
           });
-        // .then(() => {
-        //     this.close();
-
-        // })
-        // .catch(function (error) {
-        //     console.log(error);
-        //     this.displayNotification("error", error.message);
-        // });
-        //     };
-
-        //console.log(this.quotationModel);
-
-        // let me = this;
-        // me.quotationModel.CreatedBy = this.$store.state.user.name;
-        // me.quotationModel.companyKey = me.$store.state.user.company;
-
-        // if (me.invoiceDraftModel.cardCode != "") {
-        //   me.invoiceDraftModel.cardName = me.businessPartners.find(
-        //     (x) => x.cardCode == me.invoiceDraftModel.cardCode
-        //   ).cardName;
-        // }
-        //   await axios
-        //     .post(
-        //       "api/InvoiceDrafts/PostInvoiceDraft",
-        //       me.invoiceDraftModel,
-        //       me.invoiceDraftModel.invoiceDraftDetail
-        //     )
-        //     .then(function (response) {
-        //       if (response.data.result == "ERROR") {
-        //         me.displayNotification("error", response.data.message);
-        //       } else {
-        //         if (me.invoiceDraftModel.invoiceDraftKey > 0) {
-        //           router.push({
-        //             name: "home",
-        //           });
-        //         }
-        //         me.close();
-        //         me.clean();
-        //         me.displayNotification(
-        //           "success",
-        //           "Se realizó la operación correctamente."
-        //         );
-        //       }
-        //     })
-        //     .catch(function (error) {
-        //       me.displayNotification("error", error.message);
-        //     });
-      }
-    },
-
-    async getUserData(uid) {
-      const userRef = doc(db, "profiles", uid);
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists()) {
-        this.company = userSnap.data().company;
-      } else {
-        console.log("No such document!");
       }
     },
 
     closeDialog() {
       this.dialog = false;
+      this.dialogqr = false;
       setTimeout(() => {
         this.quotationDetailModel = new QuotationDetailModel();
         this.editedIndex = -1;
@@ -749,7 +692,7 @@ export default {
     },
     close() {
       setTimeout(() => {
-        this.invoiceDraftModel = new InvoiceDraftModel();
+        this.quotationModel = new QuotationModel();
         this.editedIndex = -1;
       }, 300);
     },
@@ -829,10 +772,6 @@ export default {
         showConfirmButton: false,
         timer: 2500,
       });
-    },
-
-    clean() {
-      this.invoiceDraftModel = new InvoiceDraftModel();
     },
   },
 };
