@@ -33,7 +33,7 @@
                 <v-card-title>
                   <span class="headline">Escanear Código</span>
                 </v-card-title>
-                <v-card-text>
+                <v-card-text v-if="dialog">
                   <StreamBarcodeReader
                     @decode="(a, b, c) => onDecode(a, b, c)"
                     @loaded="() => onLoaded()"
