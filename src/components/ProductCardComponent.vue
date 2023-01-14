@@ -7,88 +7,88 @@
         indeterminate
       ></v-progress-linear>
     </template>
-
-    <v-img
-      height="250"
-      src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
-    ></v-img>
-
-    <v-card-title>Cafe Badilico</v-card-title>
-
+    <v-img height="250" :src="imgURL"></v-img>
+    <v-card-title>{{ this.product.ItemName }}</v-card-title>
     <v-card-text>
-      <v-row align="center" class="mx-0">
-        <v-rating
-          :value="4.5"
-          color="amber"
-          dense
-          half-increments
-          readonly
-          size="14"
-        ></v-rating>
-
-        <div class="grey--text ms-4">4.5 (413)</div>
-      </v-row>
-
-      <div class="my-4 text-subtitle-1">$ • Italian, Cafe</div>
-
-      <div>
-        Small plates, salads & sandwiches - an intimate setting with 12 indoor
-        seats plus patio seating.
+      <v-row align="center" class="mx-0"> </v-row>
+      <div class="my-4 text-subtitle-1">RD$ : {{ this.product.Price }}</div>
+      <div class="my-4 text-subtitle-1">
+        Disponible : {{ this.product.Quantity }}
       </div>
+      <div class="my-4 text-subtitle-1">Referencia:</div>
+      <div>{{ this.product.ItemCode }} - {{ this.product.ItemName }}</div>
     </v-card-text>
-
     <v-divider class="mx-4"></v-divider>
-
-    <v-card-title>Tonight's availability</v-card-title>
-
-    <v-card-text>
-      <v-chip-group
-        v-model="selection"
-        active-class="deep-purple accent-4 white--text"
-        column
-      >
-        <v-chip>5:30PM</v-chip>
-
-        <v-chip>7:30PM</v-chip>
-
-        <v-chip>8:00PM</v-chip>
-
-        <v-chip>9:00PM</v-chip>
-      </v-chip-group>
-    </v-card-text>
-
-    <v-card-actions>
-      <v-btn color="deep-purple lighten-2" text @click="reserve">
-        Reserve
-      </v-btn>
-    </v-card-actions>
+    <v-card-title>{{ this.product.ItmsGrpNam }}</v-card-title>
   </v-card>
 </template>
 
 <script>
-import router from "../router";
+//import router from "../router";
+import { firebaseApp } from "../firebase";
+import {
+  getFirestore,
+  getDocsFromCache,
+  getDocs,
+  getDoc,
+  collection,
+  query,
+  where,
+} from "firebase/firestore";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+
+const db = getFirestore(firebaseApp);
+
 export default {
   data() {
     return {
       itemcode: "",
       loading: false,
-      selection: 0,
+      imgURL: "https://cdn.vuetifyjs.com/images/parallax/material.jpg",
+      product: {},
     };
   },
   created() {
-    this.getItem();
+    this.getProduct();
+    this.getImage();
   },
   methods: {
-    getItem() {
-      this.itemcode = this.$route.params.itemcode;
-      if (this.itemcode != undefined) {
-        console.log(this.itemcode);
-      }
+    async getImage() {
+      const storage = getStorage();
+      getDownloadURL(ref(storage, "images/" + this.itemcode + ".jpg"))
+        .then((url) => {
+          // `url` is the download URL for 'images/stars.jpg'
+          this.imgURL = url;
+        })
+        .catch((error) => {
+          // Handle any errors
+        });
     },
-    reserve() {
-      this.loading = true;
 
-      setTimeout(() => (this.loading = false), 2000);
+    async getProduct() {
+      let products = [];
+      let querySnapshot;
+      this.itemcode = this.$route.params.itemcode;
+
+      if (this.itemcode != undefined) {
+        const q = query(
+          collection(db, "OITM"),
+          where("ItemCode", "==", this.itemcode)
+        );
+
+        querySnapshot = await getDocs(q);
+
+        querySnapshot.forEach((doc) => {
+          products.push({
+            ItemCode: doc.data().ItemCode,
+            ItemName: doc.data().ItemName,
+            ItmsGrpNam: doc.data().ItmsGrpNam,
+            Price: doc.data().Price.toFixed(2),
+            Quantity: doc.data().Quantity,
+          });
+        });
+        this.product = products[0];
+      }
     },
   },
 };
