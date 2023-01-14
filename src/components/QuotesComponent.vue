@@ -432,7 +432,6 @@ import axios from "axios";
 import { mask } from "vue-the-mask";
 import router from "../router";
 import InvoiceDraftModel from "../models/InvoiceDraftModel";
-import InvoiceDraftDetailModel from "../models/InvoiceDraftDetailModel";
 
 import QuotationModel from "../models/QuotationModel";
 import QuotationDetailModel from "../models/QuotationDetailModel";
