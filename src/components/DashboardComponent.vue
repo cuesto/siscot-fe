@@ -163,8 +163,8 @@ export default {
 
     viewQuote(item) {
       router.push({
-        name: "stocktransferIdView",
-        params: { id: item.stockTransferKey, disabled: true },
+        name: "quotesIdView",
+        params: { id: item.Id, disabled: true },
       });
     },
 

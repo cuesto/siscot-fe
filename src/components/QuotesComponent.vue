@@ -600,10 +600,10 @@ export default {
           console.log("No such document!");
         }
       }
-      // let disable = this.$route.params.disabled;
-      // if (disable != undefined) {
-      //   this.disabled = disable;
-      // }
+      let disable = this.$route.params.disabled;
+      if (disable != undefined) {
+        this.disabled = disable;
+      }
     },
 
     async getUserData(uid) {
@@ -811,8 +811,10 @@ export default {
             "Existe un socio con el mismo RNC/Cédula"
           );
         } else {
-          this.bpModel.CardCode =
-            Math.floor(Math.random() * (333333 - 222222 + 1)) + 222222;
+          const crypto = window.crypto || window.msCrypto;
+          var array = new Uint32Array(1);
+
+          this.bpModel.CardCode = "" + crypto.getRandomValues(array)[0];
 
           setDoc(
             doc(businessPartnerRef),
