@@ -812,7 +812,7 @@ export default {
           );
         } else {
           const crypto = window.crypto || window.msCrypto;
-          var array = new Uint32Array(1);
+          let array = new Uint32Array(1);
 
           this.bpModel.CardCode = "" + crypto.getRandomValues(array)[0];
 
