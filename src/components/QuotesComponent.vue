@@ -428,10 +428,8 @@
 </template>
 
 <script>
-import axios from "axios";
+import router from "../router";
 import { mask } from "vue-the-mask";
-import InvoiceDraftModel from "../models/InvoiceDraftModel";
-
 import QuotationModel from "../models/QuotationModel";
 import QuotationDetailModel from "../models/QuotationDetailModel";
 import BusinessPartnerModel from "../models/BusinessPartnerModel";
@@ -442,6 +440,7 @@ import {
   getFirestore,
   doc,
   getDoc,
+  getDocs,
   getDocsFromCache,
   setDoc,
   collection,
@@ -462,6 +461,7 @@ export default {
   },
   data() {
     return {
+      Id: "",
       ItemCode: "",
       businessPartners: [],
       items: [],
@@ -476,7 +476,7 @@ export default {
       menuDocDate: false,
       dialog: false,
       dialogqr: false,
-      dialogbp: true,
+      dialogbp: false,
 
       quotationModel: new QuotationModel(),
       quotationDetailModel: new QuotationDetailModel(),
@@ -530,11 +530,6 @@ export default {
           sortable: false,
         },
       ],
-
-      //warehouses: [],
-
-      //rates: [],
-
       rules: {
         required: (value) => !!value || "Requerido.",
         positivevalue: (value) =>
@@ -545,8 +540,6 @@ export default {
           return pattern.test(value) || "Correo Inválido.";
         },
       },
-      invoiceDraftModel: new InvoiceDraftModel(),
-
       editedIndex: -1,
 
       disabled: false,
@@ -570,7 +563,7 @@ export default {
       }
     });
 
-    // this.loadInvoiceDraftEdit();
+    this.loadQuote();
   },
   computed: {
     formTitle() {
@@ -594,6 +587,25 @@ export default {
     },
   },
   methods: {
+    async loadQuote() {
+      this.Id = this.$route.params.id;
+      if (this.Id != undefined) {
+        const docRef = doc(db, "OQUT", this.Id);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          this.quotationModel = docSnap.data();
+        } else {
+          // doc.data() will be undefined in this case
+          console.log("No such document!");
+        }
+      }
+      // let disable = this.$route.params.disabled;
+      // if (disable != undefined) {
+      //   this.disabled = disable;
+      // }
+    },
+
     async getUserData(uid) {
       const userRef = doc(db, "profiles", uid);
       const userSnap = await getDoc(userRef);
@@ -799,8 +811,8 @@ export default {
             "Existe un socio con el mismo RNC/Cédula"
           );
         } else {
-
-          this.bpModel.CardCode =  Math.floor(Math.random() * (333333 - 222222 + 1) ) + 222222;
+          this.bpModel.CardCode =
+            Math.floor(Math.random() * (333333 - 222222 + 1)) + 222222;
 
           setDoc(
             doc(businessPartnerRef),
@@ -897,16 +909,22 @@ export default {
         this.quotationModel.U_Tipo_NCF = bp.U_Tipo_NCF;
         this.quotationModel.U_RNC_Ced = bp.FederalTaxID;
 
-        setDoc(
-          doc(quotationRef),
-          JSON.parse(JSON.stringify(this.quotationModel))
-        )
+        let q;
+
+        if (this.Id == "" || this.Id == undefined) {
+          q = doc(quotationRef);
+        } else {
+          q = doc(quotationRef, this.Id);
+        }
+
+        setDoc(q, JSON.parse(JSON.stringify(this.quotationModel)))
           .then(() => {
             this.close();
             this.displayNotification(
               "success",
               "Se realizó la operación correctamente."
             );
+            router.push({ name: "dashboard" });
           })
           .catch(function (error) {
             this.displayNotification("error", error.message);
@@ -916,14 +934,14 @@ export default {
 
     closeDialog() {
       setTimeout(() => {
-        if (this.dialog) {
+        if (this.dialog || this.dialogqr) {
           this.dialog = false;
           this.dialogqr = false;
           this.quotationDetailModel = new QuotationDetailModel();
           this.$refs.formDialog.resetValidation();
           this.editedIndex = -1;
           this.ItemCode = "";
-        } else {
+        } else if (this.dialogbp) {
           this.dialogbp = false;
           this.bpModel = new BusinessPartnerModel();
           this.$refs.formDialogBP.resetValidation();
@@ -947,31 +965,6 @@ export default {
         showConfirmButton: false,
         timer: 2500,
       });
-    },
-    //////////////////////
-
-    loadInvoiceDraftEdit() {
-      this.id = this.$route.params.id;
-      if (this.id != undefined) {
-        this.getInvoiceDraftEdit();
-      }
-      let disable = this.$route.params.disabled;
-      if (disable != undefined) {
-        this.disabled = disable;
-      }
-    },
-
-    async getInvoiceDraftEdit() {
-      let me = this;
-      await axios
-        .get("api/InvoiceDrafts/GetInvoiceDraftByKey/" + this.id)
-        .then(function (response) {
-          me.invoiceDraftModel = response.data;
-          me.Currency = me.invoiceDraftModel.currency;
-        })
-        .catch(function (error) {
-          me.displayNotification("error", error.message);
-        });
     },
   },
 };

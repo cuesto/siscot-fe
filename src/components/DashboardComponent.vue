@@ -1,106 +1,196 @@
 <template>
-  <div class="hello" ref="chartdiv">
-  </div>
+  <v-layout align-start>
+    <v-flex>
+      <v-card>
+        <v-container>
+          <v-row cols="6">
+            <v-col>
+              <v-card>
+                <v-data-table
+                  :items-per-page="10"
+                  :footer-props="{
+                    'items-per-page-options': [10, 15, 20, 25, 50],
+                  }"
+                  :headers="headersQuotes"
+                  :search="searchQuote"
+                  :items="quotes"
+                  class="elevation-1"
+                  :loading="loadingQT"
+                >
+                  <template v-slot:top>
+                    <v-toolbar flat color="#b3e5cc">
+                      <v-toolbar-title>Cotizaciones</v-toolbar-title>
+                      <v-divider class="mx-4" inset vertical></v-divider>
+                      <v-spacer></v-spacer>
+                      <v-text-field
+                        class="text-xs-center"
+                        v-model="searchQuote"
+                        append-icon="search"
+                        label="Búsqueda"
+                        single-line
+                        hide-details
+                      ></v-text-field>
+                    </v-toolbar>
+                  </template>
+                  <template #[`item.options`]="{ item }">
+                    <v-icon
+                      v-if="item.IsTransfered == true"
+                      size="sm"
+                      variant="outline-info"
+                      color="green"
+                      class="mr-1"
+                      >done_outline</v-icon
+                    >
+                    <v-icon
+                      v-if="item.IsTransfered == false"
+                      size="sm"
+                      variant="outline-info"
+                      color="blue"
+                      class="mr-1"
+                      @click="viewQuote(item)"
+                      >remove_red_eye</v-icon
+                    >
+                    <v-icon
+                      v-if="item.IsTransfered == false"
+                      size="sm"
+                      variant="outline-info"
+                      color="blue"
+                      class="mr-1"
+                      @click="editQuote(item)"
+                      >edit</v-icon
+                    >
+                    <v-icon
+                      v-if="item.IsTransfered == false"
+                      size="sm"
+                      color="red"
+                      class="mr-1"
+                      @click="deleteQuote(item)"
+                      >delete</v-icon
+                    >
+                  </template>
+                  <template v-slot:no-data>
+                    <v-btn color="primary" @click="getQuotes(true)">
+                      <v-icon left dark>autorenew</v-icon>Refrescar
+                    </v-btn>
+                  </template>
+                </v-data-table>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card>
+    </v-flex>
+  </v-layout>
 </template>
 
 <script>
-import * as am5 from '@amcharts/amcharts5';
-import * as am5xy from '@amcharts/amcharts5/xy';
-import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
+import router from "../router";
+import { firebaseApp } from "../firebase";
+import {
+  getFirestore,
+  doc,
+  getDocsFromCache,
+  getDocs,
+  deleteDoc,
+  collection,
+} from "firebase/firestore";
 
+const db = getFirestore(firebaseApp);
 
 export default {
-  name: 'HelloWorld',
+  components: {},
+  data: () => ({
+    loadingQT: false,
+    searchQuote: "",
+    quotes: [],
+    headersQuotes: [
+      { text: "Id", value: "IdDisplay"},
+      { text: "Fecha Documento", sortable: true, value: "DocDate"},
+      { text: "Cliente", sortable: true, value: "Client" },
+      { text: "Comentarios", sortable: true, value: "Comments" },
+      { text: "Total", sortable: true, value: "Total" },
+      { text: "DocEntry SAP", sortable: true, value: "DocEntry" },
+      { text: "Log", value: "logDescription" },
+      { text: "Opciones", value: "options", sortable: false },
+    ],
+  }),
   mounted() {
-    let root = am5.Root.new(this.$refs.chartdiv);
-
-    root.setThemes([am5themes_Animated.new(root)]);
-
-    let chart = root.container.children.push(
-      am5xy.XYChart.new(root, {
-        panY: false,
-        layout: root.verticalLayout
-      })
-    );
-
-    // Define data
-    let data = [{
-        category: "Research",
-        value1: 1000,
-        value2: 588
-      },
- {
-        category: "Marketing",
-        value1: 1200,
-        value2: 1800
-      }, {
-        category: "Sales",
-        value1: 850,
-        value2: 1230
-      }
-    ];
-
-    // Create Y-axis
-    let yAxis = chart.yAxes.push(
-      am5xy.ValueAxis.new(root, {
-        renderer: am5xy.AxisRendererY.new(root, {})
-      })
-    );
-
-    // Create X-Axis
-    let xAxis = chart.xAxes.push(
-      am5xy.CategoryAxis.new(root, {
-        renderer: am5xy.AxisRendererX.new(root, {}),
-        categoryField: "category"
-      })
-    );
-    xAxis.data.setAll(data);
-
-    // Create series
-    let series1 = chart.series.push(
-      am5xy.ColumnSeries.new(root, {
-        name: "Series",
-        xAxis: xAxis,
-        yAxis: yAxis,
-        valueYField: "value1",
-        categoryXField: "category"
-      })
-    );
-    series1.data.setAll(data);
-
-    let series2 = chart.series.push(
-      am5xy.ColumnSeries.new(root, {
-        name: "Series",
-        xAxis: xAxis,
-        yAxis: yAxis,
-        valueYField: "value2",
-        categoryXField: "category"
-      })
-    );
-    series2.data.setAll(data);
-
-    // Add legend
-    let legend = chart.children.push(am5.Legend.new(root, {}));
-    legend.data.setAll(chart.series.values);
-
-    // Add cursor
-    chart.set("cursor", am5xy.XYCursor.new(root, {}));
-
-    this.root = root;
+    this.getQuotes();
   },
 
-  beforeDestroy() {
-    if (this.root) {
-      this.root.dispose();
-    }
-  }
-}
-</script>
+  methods: {
+    displayNotification(type, message) {
+      this.$swal.fire({
+        position: "top-end",
+        type: type,
+        title: message,
+        showConfirmButton: false,
+        timer: 2500,
+      });
+    },
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-.hello {
-  width: 100%;
-  height: 500px;
-}
-</style>
+    async getQuotes(requestData) {
+      this.loadingQT = true;
+      this.quotes = [];
+      let querySnapshot;
+
+      if (requestData) {
+        querySnapshot = await getDocs(collection(db, "OQUT"));
+      } else {
+        querySnapshot = await getDocsFromCache(collection(db, "OQUT"));
+      }
+      querySnapshot.forEach((doc) => {
+        this.quotes.push({
+          Id: doc.id,
+          IdDisplay: doc.id.substring(0, 6),
+          Client: doc.data().CardCode +"-"+doc.data().CardName,
+          DocDate: doc.data().DocDate,
+          DocEntry: doc.data().DocEntry,
+          Comments: doc.data().Comments,
+          IsTransfered: doc.data().IsTransfered,
+          Total: doc.data().Total
+        });
+      });
+      this.loadingQT = false;
+    },
+
+    editQuote(item) {
+      router.push({
+        name: "quotesId",
+        params: { id: item.Id },
+      });
+    },
+
+    viewQuote(item) {
+      router.push({
+        name: "stocktransferIdView",
+        params: { id: item.stockTransferKey, disabled: true },
+      });
+    },
+
+   async deleteQuote(item) {
+      this.$swal
+        .fire({
+          title: "¿Está Seguro de borrar este registro?",
+          text: "¡No será posible revertir el cambio!",
+          type: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          confirmButtonText: "¡Si!",
+          cancelButtonText: "Cancelar",
+        })
+        .then((result) => {
+          if (result.value) {
+            console.log(item.Id)
+            this.deleteItem(item.Id);
+            this.getQuotes(true);
+          }
+        });
+    },
+
+    async deleteItem(Id){
+      await deleteDoc(doc(db, "OQUT", Id));
+    },
+  },
+};
+</script>

@@ -14,7 +14,7 @@ class QuotationModel {
         this.Tax = 0;
         this.Total = 0;
         this.DocumentLines = [];
-        this.IsTranfered = false;
+        this.IsTransfered = false;
         this.Log="";
 
 
