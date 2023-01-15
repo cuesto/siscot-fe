@@ -65,6 +65,7 @@
 </template>
 
 <script>
+import { StreamBarcodeReader } from "vue-barcode-reader";
 import { firebaseApp } from "../firebase";
 import {
   getFirestore,
@@ -73,8 +74,6 @@ import {
   collection,
 } from "firebase/firestore";
 
-import { StreamBarcodeReader } from "vue-barcode-reader";
-
 const db = getFirestore(firebaseApp);
 
 export default {
@@ -82,7 +81,6 @@ export default {
     StreamBarcodeReader,
   },
   data: () => ({
-    id: null,
     dialog: false,
     products: [],
     headers: [
@@ -152,8 +150,6 @@ export default {
       this.loadingtable = true;
       this.products = [];
       let querySnapshot;
-
-      console.log(requestData);
 
       if (requestData) {
         querySnapshot = await getDocs(collection(db, "OITM"));

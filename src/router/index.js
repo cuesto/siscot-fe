@@ -32,6 +32,22 @@ const routes = [
     }
   },
   {
+    path: '/quotes/:id',
+    name: 'quotesId',
+    component: Quotes,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/quotes/:id/:disabled',
+    name: 'quotesIdView',
+    component: Quotes,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
     path: '/products',
     name: 'products',
     component: Products,
