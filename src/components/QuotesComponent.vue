@@ -430,7 +430,6 @@
 <script>
 import axios from "axios";
 import { mask } from "vue-the-mask";
-import router from "../router";
 import InvoiceDraftModel from "../models/InvoiceDraftModel";
 
 import QuotationModel from "../models/QuotationModel";
@@ -443,10 +442,8 @@ import {
   getFirestore,
   doc,
   getDoc,
-  getDocs,
   getDocsFromCache,
   setDoc,
-  deleteDoc,
   collection,
 } from "firebase/firestore";
 import { StreamBarcodeReader } from "vue-barcode-reader";
@@ -612,8 +609,8 @@ export default {
       this.businessPartners = [];
       let querySnapshot;
 
-      //querySnapshot = await getDocs(collection(db, "OCRD"));
-      querySnapshot = await getDocsFromCache(collection(db, "OCRD"));
+      querySnapshot = await getDocs(collection(db, "OCRD"));
+      //querySnapshot = await getDocsFromCache(collection(db, "OCRD"));
       querySnapshot.forEach((doc) => {
         this.businessPartners.push({
           CardCode: doc.data().CardCode,
@@ -637,8 +634,8 @@ export default {
       this.loadingItems = true;
       this.items = [];
       let querySnapshot;
-      //querySnapshot = await getDocs(collection(db, "OITM"));
-      querySnapshot = await getDocsFromCache(collection(db, "OITM"));
+      querySnapshot = await getDocs(collection(db, "OITM"));
+      //querySnapshot = await getDocsFromCache(collection(db, "OITM"));
 
       querySnapshot.forEach((doc) => {
         this.items.push({
@@ -658,8 +655,8 @@ export default {
       let me = this;
       me.loadingTaxes = true;
       let querySnapshot;
-      //querySnapshot = await getDocs(collection(db, "OSTA"));
-      querySnapshot = await getDocsFromCache(collection(db, "OSTA"));
+      querySnapshot = await getDocs(collection(db, "OSTA"));
+      //querySnapshot = await getDocsFromCache(collection(db, "OSTA"));
 
       querySnapshot.forEach((doc) => {
         this.taxes.push({
@@ -676,8 +673,8 @@ export default {
       this.loadingNCFTypes = true;
       this.ncfTypes = [];
       let querySnapshot;
-      //querySnapshot = await getDocs(collection(db, "TIPONCF"));
-      querySnapshot = await getDocsFromCache(collection(db, "TIPONCF"));
+      querySnapshot = await getDocs(collection(db, "TIPONCF"));
+      //querySnapshot = await getDocsFromCache(collection(db, "TIPONCF"));
       querySnapshot.forEach((doc) => {
         this.ncfTypes.push({
           Code: doc.data().Code,
@@ -690,8 +687,8 @@ export default {
     async getIDTypes() {
       this.idTypes = [];
       let querySnapshot;
-      //querySnapshot = await getDocs(collection(db, "TIPOID"));
-      querySnapshot = await getDocsFromCache(collection(db, "TIPOID"));
+      querySnapshot = await getDocs(collection(db, "TIPOID"));
+      //querySnapshot = await getDocsFromCache(collection(db, "TIPOID"));
       querySnapshot.forEach((doc) => {
         this.idTypes.push({
           Code: doc.data().Code,
@@ -703,8 +700,8 @@ export default {
     async getIndicators() {
       this.indicators = [];
       let querySnapshot;
-      //querySnapshot = await getDocs(collection(db, "OIDC"));
-      querySnapshot = await getDocsFromCache(collection(db, "OIDC"));
+      querySnapshot = await getDocs(collection(db, "OIDC"));
+      //querySnapshot = await getDocsFromCache(collection(db, "OIDC"));
       querySnapshot.forEach((doc) => {
         this.indicators.push({
           Code:
@@ -717,8 +714,8 @@ export default {
     async getSalesPersons() {
       this.salesPersons = [];
       let querySnapshot;
-      //querySnapshot = await getDocs(collection(db, "OSLP"));
-      querySnapshot = await getDocsFromCache(collection(db, "OSLP"));
+      querySnapshot = await getDocs(collection(db, "OSLP"));
+      //querySnapshot = await getDocsFromCache(collection(db, "OSLP"));
       querySnapshot.forEach((doc) => {
         this.salesPersons.push({
           SlpCode: doc.data().SlpCode,
