@@ -18,9 +18,158 @@
                     hint="Código - Nombre - RNC/Cédula"
                     :loading="loadingBP"
                   ></v-autocomplete>
-                  <v-btn color="primary">
-                    <v-icon left dark>mdi-account-plus</v-icon>Agregar Cliente
-                  </v-btn>
+                  <v-dialog v-model="dialogbp" persistent max-width="600px">
+                    <template v-slot:activator="{ on }">
+                      <v-btn color="primary" dark v-on="on" v-if="!disabled">
+                        <v-icon left dark>mdi-account-plus</v-icon>Agregar
+                        Cliente
+                      </v-btn>
+                    </template>
+                    <v-form ref="formDialogBP">
+                      <v-card>
+                        <v-card-title>
+                          <span class="headline">Agregar Cliente</span>
+                        </v-card-title>
+                        <v-card-text>
+                          <v-container>
+                            <v-row>
+                              <v-col cols="7" sm="6" md="6">
+                                <v-text-field
+                                  label="Nombre"
+                                  :rules="[rules.required]"
+                                  v-model="bpModel.CardName"
+                                ></v-text-field>
+                              </v-col>
+                              <v-col cols="5" sm="6" md="6">
+                                <v-select
+                                  :loading="loadingNCFTypes"
+                                  undefined
+                                  v-model="bpModel.U_Tipo_NCF"
+                                  :items="ncfTypes"
+                                  item-text="Name"
+                                  item-value="Code"
+                                  :rules="[rules.required]"
+                                  color="blue-grey lighten-2"
+                                  label="Tipo NCF"
+                                ></v-select>
+                              </v-col>
+                            </v-row>
+                            <v-row>
+                              <v-col cols="6" sm="6" md="6">
+                                <v-text-field
+                                  label="Email"
+                                  :rules="[rules.required, rules.email]"
+                                  v-model="bpModel.EmailAddress"
+                                ></v-text-field>
+                              </v-col>
+                              <v-col cols="6" sm="6" md="6">
+                                <v-text-field
+                                  label="Celular"
+                                  :rules="[rules.required]"
+                                  v-model="bpModel.Phone1"
+                                ></v-text-field>
+                              </v-col>
+                            </v-row>
+                            <v-row>
+                              <v-col cols="6" sm="6" md="6">
+                                <v-select
+                                  undefined
+                                  v-model="bpModel.U_Tipo_ID"
+                                  :items="idTypes"
+                                  item-text="Name"
+                                  item-value="Code"
+                                  :rules="[rules.required]"
+                                  color="blue-grey lighten-2"
+                                  label="Tipo ID"
+                                ></v-select>
+                              </v-col>
+                              <v-col cols="6" sm="6" md="6">
+                                <v-text-field
+                                  label="RNC/Cédula"
+                                  :rules="[rules.required]"
+                                  v-model="bpModel.FederalTaxID"
+                                ></v-text-field>
+                              </v-col>
+                            </v-row>
+                            <v-row>
+                              <v-col cols="6" sm="6" md="6">
+                                <v-select
+                                  undefined
+                                  v-model="bpModel.Indicator"
+                                  :items="indicators"
+                                  item-text="Name"
+                                  item-value="Code"
+                                  :rules="[rules.required]"
+                                  color="blue-grey lighten-2"
+                                  label="Tienda"
+                                ></v-select>
+                              </v-col>
+                              <v-col cols="6" sm="6" md="6">
+                                <v-select
+                                  undefined
+                                  v-model="bpModel.SalesPersonCode"
+                                  :items="salesPersons"
+                                  item-text="SlpName"
+                                  item-value="SlpCode"
+                                  :rules="[rules.required]"
+                                  color="blue-grey lighten-2"
+                                  label="Vendedor"
+                                ></v-select>
+                              </v-col>
+                            </v-row>
+                            <v-divider></v-divider>
+                            <v-row>
+                              <v-col cols="12" sm="12" md="12">
+                                <v-text-field
+                                  label="Dirección"
+                                  :rules="[rules.required]"
+                                  v-model="bpModel.AddressName"
+                                ></v-text-field>
+                              </v-col>
+                            </v-row>
+                            <v-row>
+                              <v-col cols="12" sm="12" md="12">
+                                <v-text-field
+                                  label="Calle"
+                                  :rules="[rules.required]"
+                                  v-model="bpModel.Street"
+                                ></v-text-field>
+                              </v-col>
+                            </v-row>
+                            <v-row>
+                              <v-col cols="6" sm="6" md="6">
+                                <v-text-field
+                                  label="Ciudad"
+                                  :rules="[rules.required]"
+                                  v-model="bpModel.City"
+                                ></v-text-field>
+                              </v-col>
+                              <v-col cols="6" sm="6" md="6">
+                                <v-text-field
+                                  label="Sector"
+                                  :rules="[rules.required]"
+                                  v-model="bpModel.Block"
+                                ></v-text-field>
+                              </v-col>
+                            </v-row>
+                          </v-container>
+                          <small>*indica campo requerido.</small>
+                        </v-card-text>
+                        <v-card-actions>
+                          <v-spacer></v-spacer>
+                          <v-btn
+                            color="red darken-1"
+                            text
+                            @click="closeDialog()"
+                            >Cerrar</v-btn
+                          >
+                          <v-btn color="blue darken-1" text @click="addBP"
+                            >Agregar</v-btn
+                          >
+                        </v-card-actions>
+                      </v-card>
+                    </v-form>
+                  </v-dialog>
                 </v-flex>
                 <v-flex xs1 md3></v-flex>
                 <v-flex xs12 md3>
@@ -281,12 +430,11 @@
 <script>
 import axios from "axios";
 import { mask } from "vue-the-mask";
-import router from "../router";
 import InvoiceDraftModel from "../models/InvoiceDraftModel";
-import InvoiceDraftDetailModel from "../models/InvoiceDraftDetailModel";
 
 import QuotationModel from "../models/QuotationModel";
 import QuotationDetailModel from "../models/QuotationDetailModel";
+import BusinessPartnerModel from "../models/BusinessPartnerModel";
 
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { firebaseApp } from "../../firebase";
@@ -294,10 +442,8 @@ import {
   getFirestore,
   doc,
   getDoc,
-  getDocs,
   getDocsFromCache,
   setDoc,
-  deleteDoc,
   collection,
 } from "firebase/firestore";
 import { StreamBarcodeReader } from "vue-barcode-reader";
@@ -305,6 +451,7 @@ import { StreamBarcodeReader } from "vue-barcode-reader";
 const auth = getAuth();
 const db = getFirestore(firebaseApp);
 const quotationRef = collection(db, "OQUT");
+const businessPartnerRef = collection(db, "OCRD");
 
 export default {
   directives: {
@@ -319,15 +466,21 @@ export default {
       businessPartners: [],
       items: [],
       taxes: [],
+      ncfTypes: [],
+      idTypes: [],
+      indicators: [],
+      salesPersons: [],
 
       loadingBP: false,
       loadingItems: false,
       menuDocDate: false,
       dialog: false,
       dialogqr: false,
+      dialogbp: true,
 
       quotationModel: new QuotationModel(),
       quotationDetailModel: new QuotationDetailModel(),
+      bpModel: new BusinessPartnerModel(),
 
       loadingWhs: false,
       loadingTaxes: false,
@@ -378,12 +531,9 @@ export default {
         },
       ],
 
-      menuDispatchDate: false,
-      users: [],
-      warehouses: [],
+      //warehouses: [],
 
-      ncfTypes: [],
-      rates: [],
+      //rates: [],
 
       rules: {
         required: (value) => !!value || "Requerido.",
@@ -395,30 +545,32 @@ export default {
           return pattern.test(value) || "Correo Inválido.";
         },
       },
-       invoiceDraftModel: new InvoiceDraftModel(),
-      
+      invoiceDraftModel: new InvoiceDraftModel(),
+
       editedIndex: -1,
 
       disabled: false,
-      Currency: "",
-      Rate: 1,
-      company: "",
+      // Currency: "",
+      // Rate: 1,
+      // company: "",
     };
   },
   created() {
     this.getBusinessPartners();
     this.getItems();
     this.getTaxes();
+    this.getNCFTypes();
+    this.getIDTypes();
+    this.getIndicators();
+    this.getSalesPersons();
+
     onAuthStateChanged(auth, (user) => {
       if (user) {
         this.getUserData(user.uid);
       }
     });
 
-    // this.getWarehousesByUser();
     // this.loadInvoiceDraftEdit();
-    //this.getNCFTypes();
-    //this.getRates();
   },
   computed: {
     formTitle() {
@@ -440,15 +592,6 @@ export default {
         this.setPrice();
       },
     },
-    // Currency: {
-    //   handler: function (newValue) {
-    //     this.invoiceDraftModel.currency = newValue;
-    //     let rate = this.rates.find(
-    //       (element) => element.Currency === this.invoiceDraftModel.currency
-    //     );
-    //     this.invoiceDraftModel.rate = rate.Rate;
-    //   },
-    // },
   },
   methods: {
     async getUserData(uid) {
@@ -466,8 +609,8 @@ export default {
       this.businessPartners = [];
       let querySnapshot;
 
-      //querySnapshot = await getDocs(collection(db, "OCRD"));
-      querySnapshot = await getDocsFromCache(collection(db, "OCRD"));
+      querySnapshot = await getDocs(collection(db, "OCRD"));
+      //querySnapshot = await getDocsFromCache(collection(db, "OCRD"));
       querySnapshot.forEach((doc) => {
         this.businessPartners.push({
           CardCode: doc.data().CardCode,
@@ -491,8 +634,8 @@ export default {
       this.loadingItems = true;
       this.items = [];
       let querySnapshot;
-      //querySnapshot = await getDocs(collection(db, "OITM"));
-      querySnapshot = await getDocsFromCache(collection(db, "OITM"));
+      querySnapshot = await getDocs(collection(db, "OITM"));
+      //querySnapshot = await getDocsFromCache(collection(db, "OITM"));
 
       querySnapshot.forEach((doc) => {
         this.items.push({
@@ -512,8 +655,8 @@ export default {
       let me = this;
       me.loadingTaxes = true;
       let querySnapshot;
-      //querySnapshot = await getDocs(collection(db, "OSTA"));
-      querySnapshot = await getDocsFromCache(collection(db, "OSTA"));
+      querySnapshot = await getDocs(collection(db, "OSTA"));
+      //querySnapshot = await getDocsFromCache(collection(db, "OSTA"));
 
       querySnapshot.forEach((doc) => {
         this.taxes.push({
@@ -524,6 +667,61 @@ export default {
         });
       });
       this.loadingTaxes = false;
+    },
+
+    async getNCFTypes() {
+      this.loadingNCFTypes = true;
+      this.ncfTypes = [];
+      let querySnapshot;
+      querySnapshot = await getDocs(collection(db, "TIPONCF"));
+      //querySnapshot = await getDocsFromCache(collection(db, "TIPONCF"));
+      querySnapshot.forEach((doc) => {
+        this.ncfTypes.push({
+          Code: doc.data().Code,
+          Name: doc.data().Name,
+        });
+      });
+      this.loadingNCFTypes = false;
+    },
+
+    async getIDTypes() {
+      this.idTypes = [];
+      let querySnapshot;
+      querySnapshot = await getDocs(collection(db, "TIPOID"));
+      //querySnapshot = await getDocsFromCache(collection(db, "TIPOID"));
+      querySnapshot.forEach((doc) => {
+        this.idTypes.push({
+          Code: doc.data().Code,
+          Name: doc.data().Name,
+        });
+      });
+    },
+
+    async getIndicators() {
+      this.indicators = [];
+      let querySnapshot;
+      querySnapshot = await getDocs(collection(db, "OIDC"));
+      //querySnapshot = await getDocsFromCache(collection(db, "OIDC"));
+      querySnapshot.forEach((doc) => {
+        this.indicators.push({
+          Code:
+            doc.data().Code < 10 ? "0" + doc.data().Code : "" + doc.data().Code,
+          Name: doc.data().Name,
+        });
+      });
+    },
+
+    async getSalesPersons() {
+      this.salesPersons = [];
+      let querySnapshot;
+      querySnapshot = await getDocs(collection(db, "OSLP"));
+      //querySnapshot = await getDocsFromCache(collection(db, "OSLP"));
+      querySnapshot.forEach((doc) => {
+        this.salesPersons.push({
+          SlpCode: doc.data().SlpCode,
+          SlpName: doc.data().SlpName,
+        });
+      });
     },
 
     setPrice() {
@@ -586,6 +784,41 @@ export default {
         this.calculateTotals();
 
         this.closeDialog();
+      }
+    },
+
+    addBP() {
+      if (this.$refs.formDialogBP.validate()) {
+        let bp = this.businessPartners.find(
+          (x) => x.FederalTaxID == this.bpModel.FederalTaxID
+        );
+
+        if (bp != undefined) {
+          this.displayNotification(
+            "warning",
+            "Existe un socio con el mismo RNC/Cédula"
+          );
+        } else {
+
+          this.bpModel.CardCode =  Math.floor(Math.random() * (333333 - 222222 + 1) ) + 222222;
+
+          setDoc(
+            doc(businessPartnerRef),
+            JSON.parse(JSON.stringify(this.bpModel))
+          )
+            .then(() => {
+              this.closeDialog();
+              this.quotationModel.CardCode = this.bpModel.CardCode;
+              this.getBusinessPartners();
+              this.displayNotification(
+                "success",
+                "Se realizó la operación correctamente."
+              );
+            })
+            .catch(function (error) {
+              this.displayNotification("error", error.message);
+            });
+        }
       }
     },
 
@@ -682,21 +915,39 @@ export default {
     },
 
     closeDialog() {
-      this.dialog = false;
-      this.dialogqr = false;
       setTimeout(() => {
-        this.quotationDetailModel = new QuotationDetailModel();
-        this.editedIndex = -1;
-        this.ItemCode = "";
+        if (this.dialog) {
+          this.dialog = false;
+          this.dialogqr = false;
+          this.quotationDetailModel = new QuotationDetailModel();
+          this.$refs.formDialog.resetValidation();
+          this.editedIndex = -1;
+          this.ItemCode = "";
+        } else {
+          this.dialogbp = false;
+          this.bpModel = new BusinessPartnerModel();
+          this.$refs.formDialogBP.resetValidation();
+        }
       }, 300);
     },
+
     close() {
       setTimeout(() => {
         this.quotationModel = new QuotationModel();
+        this.$refs.form.resetValidation();
         this.editedIndex = -1;
       }, 300);
     },
 
+    displayNotification(type, message) {
+      this.$swal.fire({
+        position: "top-end",
+        type: type,
+        title: message,
+        showConfirmButton: false,
+        timer: 2500,
+      });
+    },
     //////////////////////
 
     loadInvoiceDraftEdit() {
@@ -721,57 +972,6 @@ export default {
         .catch(function (error) {
           me.displayNotification("error", error.message);
         });
-    },
-
-    async getWarehousesByUser() {
-      let me = this;
-      me.loadingWhs = true;
-      await axios
-        .get(
-          "api/Warehouses/GetWarehousesByUser/" +
-            me.$store.state.user.company +
-            "/" +
-            me.$store.state.user.userkey
-        )
-        .then(function (response) {
-          me.warehouses = response.data;
-          me.loadingWhs = false;
-        })
-        .catch(function (error) {
-          me.displayNotification("error", error.message);
-        });
-    },
-
-    async getNCFTypes() {
-      this.loadingNCFTypes = true;
-      this.ncfTypes = [];
-      const querySnapshot = await getDocsFromCache(collection(db, "TIPO_NCF"));
-      querySnapshot.forEach((doc) => {
-        this.ncfTypes.push(doc.data());
-        if (doc.data().IsDefault)
-          this.invoiceDraftModel.ncfType = doc.data().Code;
-      });
-      this.loadingNCFTypes = false;
-    },
-
-    async getRates() {
-      this.loadingRates = true;
-      this.rates = [];
-      const querySnapshot = await getDocsFromCache(collection(db, "ORTT"));
-      querySnapshot.forEach((doc) => {
-        this.rates.push(doc.data());
-        if (doc.data().IsDefault) this.Currency = doc.data().Currency;
-      });
-      this.loadingRates = false;
-    },
-    displayNotification(type, message) {
-      this.$swal.fire({
-        position: "top-end",
-        type: type,
-        title: message,
-        showConfirmButton: false,
-        timer: 2500,
-      });
     },
   },
 };
