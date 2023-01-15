@@ -59,7 +59,7 @@
         <v-layout justify-center>
             <v-flex text-md-right>
                 <v-card flat tile color="primary" class="white--text">
-                    <v-card-text class="white--text pt-0">InfoSocial &copy;2022</v-card-text>
+                    <v-card-text class="white--text pt-0">InfoSocial &copy;2023</v-card-text>
                 </v-card>
             </v-flex>
         </v-layout>

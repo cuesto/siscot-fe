@@ -5,6 +5,7 @@ import About from '../views/About.vue'
 import Dashboard from '../views/Dashboard.vue'
 import Quotes from '../views/Quotes.vue'
 import Products from '../views/Products.vue'
+import ProductCard from '../views/ProductCard.vue'
 
 import {
   getAuth,
@@ -31,11 +32,35 @@ const routes = [
     }
   },
   {
+    path: '/quotes/:id',
+    name: 'quotesId',
+    component: Quotes,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/quotes/:id/:disabled',
+    name: 'quotesIdView',
+    component: Quotes,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
     path: '/products',
     name: 'products',
     component: Products,
     meta: {
       requiresAuth: true
+    }
+  },
+  {
+    path: '/productcard/:itemcode',
+    name: 'productcard',
+    component: ProductCard,
+    meta: {
+      requiresGuest: true
     }
   },
   {
