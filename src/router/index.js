@@ -6,6 +6,7 @@ import Dashboard from '../views/Dashboard.vue'
 import Quotes from '../views/Quotes.vue'
 import Products from '../views/Products.vue'
 import ProductCard from '../views/ProductCard.vue'
+import Users from '../views/Users.vue'
 
 import {
   getAuth,
@@ -67,6 +68,14 @@ const routes = [
     path: '/dashboard',
     name: 'dashboard',
     component: Dashboard,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/users',
+    name: 'users',
+    component: Users,
     meta: {
       requiresAuth: true
     }
