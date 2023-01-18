@@ -82,10 +82,10 @@ export default {
         rules: {
             required: (value) => !!value || "Requerido.",
             email: (value) => {
-                const pattern =
-                    /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-                return pattern.test(value) || "Correo Inválido.";
-            },
+                    const pattern =
+                        /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+                    return pattern.test(value) || "Correo Inválido.";
+                },
         },
         headers: [{
                 text: "Usuario",

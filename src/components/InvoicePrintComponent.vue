@@ -21,7 +21,6 @@ import {
   where,
 } from "firebase/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
-//import easyinvoice from 'easyinvoice';
 const db = getFirestore(firebaseApp);
 
 export default {
@@ -35,8 +34,7 @@ export default {
     };
   },
   created() {
-    // this.getProduct();
-    // this.getImage();
+ 
   },
   methods: {
     async createInvoice() {
@@ -147,44 +145,6 @@ export default {
         // },
       };
     },
-
-    // async getImage() {
-    //     const storage = getStorage();
-    //     getDownloadURL(ref(storage, "images/" + this.itemcode + ".jpg"))
-    //         .then((url) => {
-    //             // `url` is the download URL for 'images/stars.jpg'
-    //             this.imgURL = url;
-    //         })
-    //         .catch((error) => {
-    //             // Handle any errors
-    //         });
-    // },
-
-    // async getProduct() {
-    //     let products = [];
-    //     let querySnapshot;
-    //     this.itemcode = this.$route.params.itemcode;
-
-    //     if (this.itemcode != undefined) {
-    //         const q = query(
-    //             collection(db, "OITM"),
-    //             where("ItemCode", "==", this.itemcode)
-    //         );
-
-    //         querySnapshot = await getDocs(q);
-
-    //         querySnapshot.forEach((doc) => {
-    //             products.push({
-    //                 ItemCode: doc.data().ItemCode,
-    //                 ItemName: doc.data().ItemName,
-    //                 ItmsGrpNam: doc.data().ItmsGrpNam,
-    //                 Price: doc.data().Price.toFixed(2),
-    //                 Quantity: doc.data().Quantity,
-    //             });
-    //         });
-    //         this.product = products[0];
-    //     }
-    // },
   },
 };
 </script>
