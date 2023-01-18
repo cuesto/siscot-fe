@@ -28,7 +28,7 @@
                                     </v-toolbar>
                                 </template>
                                 <template #[`item.options`]="{ item }">
-                                    <v-icon size="sm" color="gray" class="mr-1" @click="printQuote(item)">print</v-icon>
+                                    <!-- <v-icon size="sm" color="gray" class="mr-1" @click="printQuote(item)">print</v-icon> -->
                                     <v-icon v-if="item.IsTransfered == true" size="sm" variant="outline-info" color="green" class="mr-1">done_outline</v-icon>
                                     <v-icon v-if="item.IsTransfered == true" size="sm" variant="outline-info" color="blue" class="mr-1" @click="viewQuote(item)">remove_red_eye</v-icon>
                                     <v-icon v-if="item.IsTransfered == false" size="sm" variant="outline-info" color="blue" class="mr-1" @click="editQuote(item)">edit</v-icon>
