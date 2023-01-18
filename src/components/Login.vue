@@ -23,7 +23,7 @@
                                 </div>
                             </form>
                             <form v-else @submit.prevent>
-                                <h1>Get Started</h1>
+                                <h1>Registro</h1>
                                 <v-text-field v-model.trim="signupForm.name" label="Nombre" name="name" prepend-icon="person" type="text" :rules="[rules.required]"></v-text-field>
                                 <v-text-field v-model.trim="signupForm.username" label="Usuario" name="username" prepend-icon="person" type="text" :rules="[rules.required]"></v-text-field>
                                 <v-text-field v-model.trim="signupForm.email" label="Email" name="email2" prepend-icon="mail" type="text" :rules="[rules.required, rules.email]"></v-text-field>
@@ -72,11 +72,11 @@ export default {
             password: "", //"123456",
         },
         signupForm: {
-            name: "", 
-            username: "", 
-            email: "", 
-            password: "", 
-            company: "", 
+            name: "",
+            username: "",
+            email: "",
+            password: "",
+            company: "",
         },
         showLoginForm: true,
         rules: {
@@ -132,7 +132,7 @@ export default {
                             name: this.signupForm.name,
                             email: this.signupForm.email,
                             username: this.signupForm.username,
-                            company: this.signupForm.company,
+                            //company: this.signupForm.company,
                         })
                         .then(() => {
                             console.log("se creo el profile");

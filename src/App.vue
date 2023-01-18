@@ -28,7 +28,7 @@
                                 <v-list-item-title>Configuración</v-list-item-title>
                             </v-list-item-content>
                         </template>
-                        <v-list-item disabled>
+                        <v-list-item :to="{name: 'users'}">
                             <v-list-item-icon>
                                 <v-icon>mdi-account-multiple</v-icon>
                             </v-list-item-icon>
@@ -69,7 +69,7 @@
 
   
 <script>
-import router from "./router/index";
+import router from "./router/index"; // If line is not here the system crash when refresh de page
 import {
     getAuth,
     onAuthStateChanged,
