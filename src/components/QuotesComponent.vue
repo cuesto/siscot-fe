@@ -324,13 +324,15 @@
                                     <v-col cols="6" sm="6" md="6">
                                       <v-select
                                         undefined
-                                        v-model="quotationDetailModel.WarehouseCode"
+                                        v-model="
+                                          quotationDetailModel.WarehouseCode
+                                        "
                                         :items="warehouses"
-                                        item-text="WhsName"
+                                        item-text="displayAutoComplete"
                                         item-value="WhsCode"
                                         :rules="[rules.required]"
                                         color="blue-grey lighten-2"
-                                        label="Almacén"
+                                        label="Almacén - Cantidad Disponible"
                                       ></v-select>
                                     </v-col>
                                     <v-col cols="6" sm="6" md="6">
@@ -492,7 +494,7 @@ export default {
       businessPartners: [],
       items: [],
       taxes: [],
-      warehouses:[],
+      warehouses: [],
       ncfTypes: [],
       idTypes: [],
       indicators: [],
@@ -501,7 +503,7 @@ export default {
       loadingBP: false,
       loadingItems: false,
       menuDocDate: false,
-      dialog: true,
+      dialog: false,
       dialogqr: false,
       dialogbp: false,
 
@@ -608,14 +610,18 @@ export default {
   watch: {
     dialog(val) {
       val || this.closeDialog();
-      if (this.$refs.formDialog != undefined)
+      this.getWarehouses();
+      if (this.$refs.formDialog != undefined) {
         this.$refs.formDialog.resetValidation();
+      
+      }
     },
     ItemCode: {
       handler: function (newValue) {
         if (newValue == "" || newValue == undefined) return;
         this.quotationDetailModel.ItemCode = newValue;
         this.setPrice();
+        this.setInventoryStock();
       },
     },
   },
@@ -688,7 +694,14 @@ export default {
           ItemName: doc.data().ItemName,
           ItmsGrpNam: doc.data().ItmsGrpNam,
           UnitPrice: doc.data().Price.toFixed(2),
-          Quantity: doc.data().Quantity,
+          Alameda: doc.data().Alameda,
+          Castellana: doc.data().Castellana,
+          Punta_Cana: doc.data().Punta_Cana,
+          Santiago: doc.data().Santiago,
+          Exhibicion_Alameda: doc.data().Exhibicion_Alameda,
+          Exhibicion_Castellana: doc.data().Exhibicion_Castellana,
+          Exhibicion_Punta_Cana: doc.data().Exhibicion_Punta_Cana,
+          Exhibicion_Santiago: doc.data().Exhibicion_Santiago,
           displayAutoComplete:
             doc.data().ItemCode + " - " + doc.data().ItemName,
         });
@@ -712,22 +725,6 @@ export default {
         });
       });
       this.loadingTaxes = false;
-    },
-
-    async getWarehouses() {
-      let querySnapshot;
-      //querySnapshot = await getDocs(collection(db, "OWHS"));
-      querySnapshot = await getDocsFromCache(collection(db, "OWHS"));
-
-      querySnapshot.forEach((doc) => {
-        this.warehouses.push({
-          WhsCode: doc.data().WhsCode,
-          WhsName: doc.data().WhsName,
-          Locked: doc.data().Locked,
-          displayAutoComplete: doc.data().Code + " - " + doc.data().Rate + "%",
-        });
-      });
-      console.log(this.warehouses);
     },
 
     async getNCFTypes() {
@@ -785,11 +782,40 @@ export default {
       });
     },
 
+    async getWarehouses() {
+      let querySnapshot;
+      //querySnapshot = await getDocs(collection(db, "OWHS"));
+      querySnapshot = await getDocsFromCache(collection(db, "OWHS"));
+
+      querySnapshot.forEach((doc) => {
+        if (doc.data().Locked == "N") {
+          this.warehouses.push({
+            WhsCode: doc.data().WhsCode,
+            WhsName: doc.data().WhsName,
+            Locked: doc.data().Locked,
+            displayAutoComplete: doc.data().WhsName,
+          });
+        }
+      });
+    },
+
     setPrice() {
-      let item = this.items.find(
+      let item = this.getCurrentItem();
+      this.quotationDetailModel.UnitPrice = item.UnitPrice;
+    },
+
+    setInventoryStock() {
+      let item = this.getCurrentItem();
+      this.warehouses.map((whs) => {
+        whs.displayAutoComplete = whs.WhsName + " - " + item[whs.WhsName];
+        return whs;
+      });
+    },
+
+    getCurrentItem() {
+      return this.items.find(
         (element) => element.ItemCode === this.quotationDetailModel.ItemCode
       );
-      this.quotationDetailModel.UnitPrice = item.UnitPrice;
     },
 
     addItem() {
@@ -810,6 +836,7 @@ export default {
         itemToAdd.Quantity = this.quotationDetailModel.Quantity;
         itemToAdd.DiscountPercent = this.quotationDetailModel.DiscountPercent;
         itemToAdd.TaxCode = this.quotationDetailModel.TaxCode;
+        itemToAdd.WarehouseCode = this.quotationDetailModel.WarehouseCode;
 
         //Calulate Total Line
         if (
@@ -920,6 +947,7 @@ export default {
     },
 
     editItem(item) {
+        this.getWarehouses();
       this.editedIndex = this.quotationModel.DocumentLines.indexOf(item);
 
       this.quotationDetailModel = new QuotationDetailModel();
