@@ -183,7 +183,6 @@ export default {
                     Punta_Cana: doc.data().Punta_Cana,
                     Exhibicion_Punta_Cana: doc.data().Exhibicion_Punta_Cana,
                     Exhibicion_Alameda: doc.data().Exhibicion_Alameda,
-
                 });
             });
             this.loadingtable = false;
