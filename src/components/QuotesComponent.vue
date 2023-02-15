@@ -583,14 +583,14 @@ export default {
     };
   },
   created() {
-    this.getBusinessPartners();
-    this.getItems();
-    this.getTaxes();
-    this.getWarehouses();
-    this.getNCFTypes();
-    this.getIDTypes();
-    this.getIndicators();
-    this.getSalesPersons();
+    this.getBusinessPartners(false);
+    this.getItems(false);
+    this.getTaxes(false);
+    this.getWarehouses(false);
+    this.getNCFTypes(false);
+    this.getIDTypes(false);
+    this.getIndicators(false);
+    this.getSalesPersons(false);
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -613,7 +613,6 @@ export default {
       this.getWarehouses();
       if (this.$refs.formDialog != undefined) {
         this.$refs.formDialog.resetValidation();
-      
       }
     },
     ItemCode: {
@@ -655,13 +654,11 @@ export default {
       }
     },
 
-    async getBusinessPartners() {
+    async getBusinessPartners(requestData) {
       this.loadingBP = true;
       this.businessPartners = [];
-      let querySnapshot;
+      let querySnapshot = await this.getDataFromFirebase(requestData, "OCRD");
 
-      //querySnapshot = await getDocs(collection(db, "OCRD"));
-      querySnapshot = await getDocsFromCache(collection(db, "OCRD"));
       querySnapshot.forEach((doc) => {
         this.businessPartners.push({
           CardCode: doc.data().CardCode,
@@ -681,12 +678,10 @@ export default {
       this.loadingBP = false;
     },
 
-    async getItems() {
+    async getItems(requestData) {
       this.loadingItems = true;
       this.items = [];
-      let querySnapshot;
-      //querySnapshot = await getDocs(collection(db, "OITM"));
-      querySnapshot = await getDocsFromCache(collection(db, "OITM"));
+      let querySnapshot = await this.getDataFromFirebase(requestData, "OITM");
 
       querySnapshot.forEach((doc) => {
         this.items.push({
@@ -709,12 +704,10 @@ export default {
       this.loadingItems = false;
     },
 
-    async getTaxes() {
+    async getTaxes(requestData) {
       let me = this;
       me.loadingTaxes = true;
-      let querySnapshot;
-      //querySnapshot = await getDocs(collection(db, "OSTA"));
-      querySnapshot = await getDocsFromCache(collection(db, "OSTA"));
+      let querySnapshot = await this.getDataFromFirebase(requestData, "OSTA");
 
       querySnapshot.forEach((doc) => {
         this.taxes.push({
@@ -727,12 +720,14 @@ export default {
       this.loadingTaxes = false;
     },
 
-    async getNCFTypes() {
+    async getNCFTypes(requestData) {
       this.loadingNCFTypes = true;
       this.ncfTypes = [];
-      let querySnapshot;
-      //querySnapshot = await getDocs(collection(db, "TIPONCF"));
-      querySnapshot = await getDocsFromCache(collection(db, "TIPONCF"));
+      let querySnapshot = await this.getDataFromFirebase(
+        requestData,
+        "TIPONCF"
+      );
+
       querySnapshot.forEach((doc) => {
         this.ncfTypes.push({
           Code: doc.data().Code,
@@ -742,11 +737,10 @@ export default {
       this.loadingNCFTypes = false;
     },
 
-    async getIDTypes() {
+    async getIDTypes(requestData) {
       this.idTypes = [];
-      let querySnapshot;
-      //querySnapshot = await getDocs(collection(db, "TIPOID"));
-      querySnapshot = await getDocsFromCache(collection(db, "TIPOID"));
+      let querySnapshot = await this.getDataFromFirebase(requestData, "TIPOID");
+
       querySnapshot.forEach((doc) => {
         this.idTypes.push({
           Code: doc.data().Code,
@@ -755,11 +749,10 @@ export default {
       });
     },
 
-    async getIndicators() {
+    async getIndicators(requestData) {
       this.indicators = [];
-      let querySnapshot;
-      //querySnapshot = await getDocs(collection(db, "OIDC"));
-      querySnapshot = await getDocsFromCache(collection(db, "OIDC"));
+      let querySnapshot = await this.getDataFromFirebase(requestData, "OIDC");
+
       querySnapshot.forEach((doc) => {
         this.indicators.push({
           Code:
@@ -769,11 +762,10 @@ export default {
       });
     },
 
-    async getSalesPersons() {
+    async getSalesPersons(requestData) {
       this.salesPersons = [];
-      let querySnapshot;
-      //querySnapshot = await getDocs(collection(db, "OSLP"));
-      querySnapshot = await getDocsFromCache(collection(db, "OSLP"));
+      let querySnapshot = await this.getDataFromFirebase(requestData, "OSLP");
+
       querySnapshot.forEach((doc) => {
         this.salesPersons.push({
           SlpCode: doc.data().SlpCode,
@@ -782,10 +774,8 @@ export default {
       });
     },
 
-    async getWarehouses() {
-      let querySnapshot;
-      //querySnapshot = await getDocs(collection(db, "OWHS"));
-      querySnapshot = await getDocsFromCache(collection(db, "OWHS"));
+    async getWarehouses(requestData) {
+      let querySnapshot = await this.getDataFromFirebase(requestData, "OWHS");
 
       querySnapshot.forEach((doc) => {
         if (doc.data().Locked == "N") {
@@ -797,6 +787,14 @@ export default {
           });
         }
       });
+    },
+
+    async getDataFromFirebase(requestData, tableName) {
+      if (requestData) {
+        return await getDocs(collection(db, tableName));
+      } else {
+        return await getDocsFromCache(collection(db, tableName));
+      }
     },
 
     setPrice() {
@@ -947,7 +945,7 @@ export default {
     },
 
     editItem(item) {
-        this.getWarehouses();
+      this.getWarehouses();
       this.editedIndex = this.quotationModel.DocumentLines.indexOf(item);
 
       this.quotationDetailModel = new QuotationDetailModel();
