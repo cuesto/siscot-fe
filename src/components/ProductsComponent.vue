@@ -182,7 +182,7 @@ export default {
                     Exhibicion_Santiago: doc.data().Exhibicion_Santiago,
                     Punta_Cana: doc.data().Punta_Cana,
                     Exhibicion_Punta_Cana: doc.data().Exhibicion_Punta_Cana,
-
+                    Exhibicion_Alameda: doc.data().Exhibicion_Alameda,
 
                 });
             });
