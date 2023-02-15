@@ -84,9 +84,44 @@ export default {
                 value: "Price",
             },
             {
-                text: "Cantidad Disponible",
+                text: "Castellana",
                 sortable: false,
-                value: "Quantity",
+                value: "Castellana",
+            },
+            {
+                text: "Exhibición Castellana",
+                sortable: false,
+                value: "Exhibicion_Castellana",
+            },
+            {
+                text: "Alameda",
+                sortable: false,
+                value: "Alameda",
+            },
+            {
+                text: "Exhibición Alameda",
+                sortable: false,
+                value: "Exhibicion_Alameda",
+            },
+            {
+                text: "Santiago",
+                sortable: false,
+                value: "Santiago",
+            },
+            {
+                text: "Exhibición Santiago",
+                sortable: false,
+                value: "Exhibicion_Santiago",
+            },
+            {
+                text: "Punta Cana",
+                sortable: false,
+                value: "Punta_Cana",
+            },
+            {
+                text: "Exhibición Punta Cana",
+                sortable: false,
+                value: "Exhibicion_Punta_Cana",
             },
             {
                 text: "Opciones",
@@ -100,7 +135,7 @@ export default {
     watch: {},
     mounted() {},
     created() {
-        this.getProducts(false);
+        this.getProducts(true);
     },
     methods: {
         displayNotification(type, message) {
@@ -114,7 +149,7 @@ export default {
         },
 
         viewItem(item) {
-            console.log("ojo");
+            console.log(item);
         },
 
         onDecode(a, b, c) {
@@ -140,7 +175,14 @@ export default {
                     ItemName: doc.data().ItemName,
                     ItmsGrpNam: doc.data().ItmsGrpNam,
                     Price: doc.data().Price.toFixed(2),
-                    Quantity: doc.data().Quantity,
+                    Castellana: doc.data().Castellana,
+                    Exhibicion_Castellana: doc.data().Exhibicion_Castellana,
+                    Alameda: doc.data().Alameda,
+                    Santiago: doc.data().Santiago,
+                    Exhibicion_Santiago: doc.data().Exhibicion_Santiago,
+                    Punta_Cana: doc.data().Punta_Cana,
+                    Exhibicion_Punta_Cana: doc.data().Exhibicion_Punta_Cana,
+                    Exhibicion_Alameda: doc.data().Exhibicion_Alameda,
                 });
             });
             this.loadingtable = false;
