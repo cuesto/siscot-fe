@@ -100,13 +100,13 @@ export default {
                 value: "Total"
             },
             {
-                text: "DocEntry SAP",
+                text: "DocNum SAP",
                 sortable: true,
-                value: "DocEntry"
+                value: "DocNum"
             },
             {
                 text: "Log",
-                value: "logDescription"
+                value: "Log"
             },
             {
                 text: "Opciones",
@@ -116,7 +116,7 @@ export default {
         ],
     }),
     mounted() {
-        this.getQuotes();
+        this.getQuotes(true);
     },
 
     methods: {
@@ -151,6 +151,8 @@ export default {
                     Client: doc.data().CardCode + "-" + doc.data().CardName,
                     DocDate: doc.data().DocDate,
                     DocEntry: doc.data().DocEntry,
+                    DocNum: doc.data().DocNum,
+                    Log: doc.data().Log,
                     Comments: doc.data().Comments,
                     IsTransfered: doc.data().IsTransfered,
                     Total: doc.data().Total,
