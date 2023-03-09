@@ -15,6 +15,7 @@ class QuotationModel {
         this.Total = 0;
         this.DocumentLines = [];
         this.IsTransfered = false;
+        this.IsSalesOrder = false;
         this.Log="";
 
 

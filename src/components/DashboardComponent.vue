@@ -29,7 +29,11 @@
                                 </template>
                                 <template #[`item.options`]="{ item }">
                                     <!-- <v-icon size="sm" color="gray" class="mr-1" @click="printQuote(item)">print</v-icon> -->
+
                                     <v-icon v-if="item.IsTransfered == true" size="sm" variant="outline-info" color="green" class="mr-1">done_outline</v-icon>
+                                    <v-icon v-if="
+                        item.IsTransfered == true && item.IsSalesOrder == false
+                      " size="sm" variant="outline-info" color="purple" class="mr-1" @click="createSalesOrder(item)">mdi-file-document-arrow-right</v-icon>
                                     <v-icon v-if="item.IsTransfered == true" size="sm" variant="outline-info" color="blue" class="mr-1" @click="viewQuote(item)">remove_red_eye</v-icon>
                                     <v-icon v-if="item.IsTransfered == false" size="sm" variant="outline-info" color="blue" class="mr-1" @click="editQuote(item)">edit</v-icon>
                                     <v-icon v-if="item.IsTransfered == false" size="sm" color="red" class="mr-1" @click="deleteQuote(item)">delete</v-icon>
@@ -58,13 +62,16 @@ import {
 import {
     getFirestore,
     doc,
+    setDoc,
     getDocsFromCache,
     getDocs,
     deleteDoc,
     collection,
+    updateDoc,
 } from "firebase/firestore";
 
 const db = getFirestore(firebaseApp);
+const quotationRef = collection(db, "OQUT");
 
 export default {
     components: {
@@ -77,46 +84,46 @@ export default {
         quotes: [],
         headersQuotes: [{
                 text: "Id",
-                value: "IdDisplay"
+                value: "IdDisplay",
             },
             {
                 text: "Fecha Documento",
                 sortable: true,
-                value: "DocDate"
+                value: "DocDate",
             },
             {
                 text: "Cliente",
                 sortable: true,
-                value: "Client"
+                value: "Client",
             },
             {
                 text: "Comentarios",
                 sortable: true,
-                value: "Comments"
+                value: "Comments",
             },
             {
                 text: "Total",
                 sortable: true,
-                value: "Total"
+                value: "Total",
             },
             {
-                text: "DocEntry SAP",
+                text: "DocNum SAP",
                 sortable: true,
-                value: "DocEntry"
+                value: "DocNum",
             },
             {
                 text: "Log",
-                value: "logDescription"
+                value: "Log",
             },
             {
                 text: "Opciones",
                 value: "options",
-                sortable: false
+                sortable: false,
             },
         ],
     }),
     mounted() {
-        this.getQuotes();
+        this.getQuotes(true);
     },
 
     methods: {
@@ -151,8 +158,11 @@ export default {
                     Client: doc.data().CardCode + "-" + doc.data().CardName,
                     DocDate: doc.data().DocDate,
                     DocEntry: doc.data().DocEntry,
+                    DocNum: doc.data().DocNum,
+                    Log: doc.data().Log,
                     Comments: doc.data().Comments,
                     IsTransfered: doc.data().IsTransfered,
+                    IsSalesOrder: doc.data().IsSalesOrder,
                     Total: doc.data().Total,
                 });
             });
@@ -163,7 +173,7 @@ export default {
             router.push({
                 name: "quotesId",
                 params: {
-                    id: item.Id
+                    id: item.Id,
                 },
             });
         },
@@ -173,7 +183,7 @@ export default {
                 name: "quotesIdView",
                 params: {
                     id: item.Id,
-                    disabled: true
+                    disabled: true,
                 },
             });
         },
@@ -194,6 +204,39 @@ export default {
                         console.log(item.Id);
                         this.deleteItem(item.Id);
                         this.getQuotes(true);
+                    }
+                });
+        },
+
+        async createSalesOrder(item) {
+            this.$swal
+                .fire({
+                    title: "¿Está Seguro de convertir esta cotización a Orden de Venta?",
+                    text: "¡No será posible revertir el cambio!",
+                    type: "info",
+                    showCancelButton: true,
+                    confirmButtonColor: "blue",
+                    confirmButtonText: "¡Si!",
+                    cancelButtonText: "Cancelar",
+                })
+                .then((result) => {
+                    if (result.value) {
+                        item.IsSalesOrder = true;
+                        let q;
+                        q = doc(quotationRef, item.Id);
+
+                        updateDoc(q, {
+                                IsSalesOrder: item.IsSalesOrder,
+                            })
+                            .then(() => {
+                                this.displayNotification(
+                                    "success",
+                                    "Se realizó la operación correctamente."
+                                );
+                            })
+                            .catch(function (error) {
+                                this.displayNotification("error", error.message);
+                            });
                     }
                 });
         },

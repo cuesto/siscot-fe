@@ -4,7 +4,7 @@ class BusinessPartnerModel {
         this.CardName = "";
         this.Phone1= "";
         this.EmailAddress = "";
-        this.CardType = "cLid";
+        this.CardType = "cCustomer";
         this.U_Tipo_NCF = "CONSUMF";
         this.U_Tipo_ID = "1";
         this.SalesPersonCode = 1;
