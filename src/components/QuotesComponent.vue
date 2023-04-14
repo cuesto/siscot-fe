@@ -583,14 +583,14 @@ export default {
     };
   },
   created() {
-    this.getBusinessPartners(false);
-    this.getItems(false);
-    this.getTaxes(false);
-    this.getWarehouses(false);
-    this.getNCFTypes(false);
-    this.getIDTypes(false);
-    this.getIndicators(false);
-    this.getSalesPersons(false);
+    this.getBusinessPartners(true);
+    this.getItems(true);
+    this.getTaxes(true);
+    this.getWarehouses(true);
+    this.getNCFTypes(true);
+    this.getIDTypes(true);
+    this.getIndicators(true);
+    this.getSalesPersons(true);
 
     onAuthStateChanged(auth, (user) => {
       if (user) {

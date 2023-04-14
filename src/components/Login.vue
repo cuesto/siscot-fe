@@ -19,7 +19,7 @@
                                 <div class="extras">
                                     <v-spacer></v-spacer>
                                     <!-- Activate if need to create new account -->
-                                    <a @click="toggleForm()">Crear una cuenta</a>
+                                    <!-- <a @click="toggleForm()">Crear una cuenta</a> -->
                                 </div>
                             </form>
                             <form v-else @submit.prevent>

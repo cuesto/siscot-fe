@@ -1,0 +1,60 @@
+name: Deploy to Firebase Hosting on merge
+'on':
+  push:
+    branches:
+      - master
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7.18.2
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run tests
+        run: pnpm test:unit
+
+      - name: Run build
+        run: pnpm build
+
+      - name: Install Functions Deps
+        shell: bash
+        run: |
+          cd functions && pnpm i
+
+      # Future code for deploying without token
+      - name: Decoding base64 Credentials
+        shell: bash
+        run: echo ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_BASE64 }} | base64 --decode > credentials.json
+
+      - name: Save credentials into environment variables
+        run: echo "GOOGLE_APPLICATION_CREDENTIALS=./credentials.json" >> $GITHUB_ENV
+
+      - name: Deploy to Firebase
+        shell: bash
+        # Using GOOGLE_APPLICATION_CREDENTIALS env
+        run: |
+          ./node_modules/.bin/firebase deploy --non-interactive
+
+      - name: Remove credentials file
+        if: success() || failure()
+        run: rm credentials.json
