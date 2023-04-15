@@ -197,6 +197,26 @@
                     ></v-date-picker>
                   </v-menu>
                 </v-flex>
+                <v-flex xs12 md3>
+                  <v-text-field
+                    label="Celular"
+                    :rules="[rules.required]"
+                    v-model="quotationModel.U_TelCliente"
+                  ></v-text-field>
+                </v-flex>
+                <v-flex xs1 md1></v-flex>
+<v-flex xs12 md3>
+                  <v-select
+                                  undefined
+                                  v-model="quotationModel.SalesPersonCode"
+                                  :items="salesPersons"
+                                  item-text="SlpName"
+                                  item-value="SlpCode"
+                                  :rules="[rules.required]"
+                                  color="blue-grey lighten-2"
+                                  label="Vendedor"
+                                ></v-select>
+                </v-flex>
                 <v-flex xs12 md12>
                   <v-data-table
                     :headers="headers"
@@ -981,8 +1001,6 @@ export default {
         );
 
         this.quotationModel.CardName = bp.CardName;
-        this.quotationModel.U_TelCliente = bp.Phone1;
-        this.quotationModel.SalesPersonCode = bp.SalesPersonCode;
         this.quotationModel.U_Tipo_NCF = bp.U_Tipo_NCF;
         this.quotationModel.U_RNC_Ced = bp.FederalTaxID;
 
