@@ -74,7 +74,7 @@
                               <v-col cols="6" sm="6" md="6">
                                 <v-select
                                   undefined
-                                  v-model="bpModel.U_Tipo_ID"
+                                  v-model="U_Tipo_ID"
                                   :items="idTypes"
                                   item-text="Name"
                                   item-value="Code"
@@ -88,6 +88,7 @@
                                   label="RNC/Cédula"
                                   :rules="[rules.required]"
                                   v-model="bpModel.FederalTaxID"
+                                  v-mask="maskRNCCedula"
                                 ></v-text-field>
                               </v-col>
                             </v-row>
@@ -205,17 +206,17 @@
                   ></v-text-field>
                 </v-flex>
                 <v-flex xs1 md1></v-flex>
-<v-flex xs12 md3>
+                <v-flex xs12 md3>
                   <v-select
-                                  undefined
-                                  v-model="quotationModel.SalesPersonCode"
-                                  :items="salesPersons"
-                                  item-text="SlpName"
-                                  item-value="SlpCode"
-                                  :rules="[rules.required]"
-                                  color="blue-grey lighten-2"
-                                  label="Vendedor"
-                                ></v-select>
+                    undefined
+                    v-model="quotationModel.SalesPersonCode"
+                    :items="salesPersons"
+                    item-text="SlpName"
+                    item-value="SlpCode"
+                    :rules="[rules.required]"
+                    color="blue-grey lighten-2"
+                    label="Vendedor"
+                  ></v-select>
                 </v-flex>
                 <v-flex xs12 md12>
                   <v-data-table
@@ -581,6 +582,7 @@ export default {
           value: "options",
           sortable: false,
         },
+
       ],
       rules: {
         required: (value) => !!value || "Requerido.",
@@ -593,11 +595,9 @@ export default {
         },
       },
       editedIndex: -1,
-
       disabled: false,
-      // Currency: "",
-      // Rate: 1,
-      // company: "",
+      U_Tipo_ID: "",
+      maskRNCCedula:""
     };
   },
   created() {
@@ -641,6 +641,19 @@ export default {
         this.setInventoryStock();
       },
     },
+    U_Tipo_ID:{
+      handler: function(newValue){
+        if (newValue == "" || newValue == undefined) return;
+        this.bpModel.U_Tipo_ID = newValue;
+        if(newValue ==1){
+          this.maskRNCCedula = '#########'
+        }else if(newValue == 2){
+          this.maskRNCCedula = '###########'
+        }else{
+          this.maskRNCCedula = null
+        }
+      }
+    }
   },
   methods: {
     async loadQuote() {
@@ -1063,6 +1076,12 @@ export default {
         timer: 2500,
       });
     },
+
+    validateRNCCedula(){
+console.log("Validar")
+return '###'
+    },
+
   },
 };
 </script>
