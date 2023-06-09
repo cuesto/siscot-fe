@@ -16,8 +16,8 @@ class QuotationModel {
         this.DocumentLines = [];
         this.IsTransfered = false;
         this.IsSalesOrder = false;
-        this.Log="";
-
+        this.Log = "";
+        this.Indicator = "";
 
         this.CreatedBy = "";
         this.ModifiedBy = "";

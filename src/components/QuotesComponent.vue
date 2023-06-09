@@ -687,6 +687,7 @@ export default {
           SalesPersonCode: doc.data().SalesPersonCode,
           FederalTaxID: doc.data().FederalTaxID,
           U_Tipo_NCF: doc.data().U_Tipo_NCF,
+          Indicator: doc.data().Indicator,
           displayAutoComplete:
             doc.data().CardCode +
             " - " +
@@ -1003,6 +1004,7 @@ export default {
         this.quotationModel.CardName = bp.CardName;
         this.quotationModel.U_Tipo_NCF = bp.U_Tipo_NCF;
         this.quotationModel.U_RNC_Ced = bp.FederalTaxID;
+        this.quotationModel.Indicator = bp.Indicator;
 
         let q;
 

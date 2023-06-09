@@ -95,7 +95,7 @@
                                 :items="U_PagoVirtual"
                                 :rules="[rules.required]"
                                 color="blue-grey lighten-2"
-                                label="Tipo ID"
+                                label="Pago Virtual"
                               ></v-select>
                             </v-col>
                             <v-col
