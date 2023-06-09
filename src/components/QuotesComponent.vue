@@ -310,10 +310,8 @@
                                         label="Precio"
                                         prefix="RD$"
                                         type="number"
-                                        :rules="[
-                                          rules.required,
-                                          rules.positivevalue,
-                                        ]"
+                                        readonly
+                                        disabled
                                         v-model="quotationDetailModel.UnitPrice"
                                       ></v-text-field>
                                     </v-col>
