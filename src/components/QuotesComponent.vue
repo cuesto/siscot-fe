@@ -290,8 +290,19 @@
                                         :items="items"
                                         :rules="[rules.required]"
                                         color="blue-grey lighten-2"
-                                        label="Artículo"
-                                        item-text="displayAutoComplete"
+                                        label="Número de Artículo"
+                                        item-text="ItemCode"
+                                        item-value="ItemCode"
+                                        hint="Código - Artículo"
+                                        :loading="loadingItems"
+                                      ></v-autocomplete>
+                                      <v-autocomplete
+                                        v-model="ItemCode"
+                                        :items="items"
+                                        :rules="[rules.required]"
+                                        color="blue-grey lighten-2"
+                                        label="Descripción"
+                                        item-text="ItemName"
                                         item-value="ItemCode"
                                         hint="Código - Artículo"
                                         :loading="loadingItems"
@@ -604,7 +615,6 @@ export default {
           value: "options",
           sortable: false,
         },
-
       ],
       rules: {
         required: (value) => !!value || "Requerido.",
@@ -619,7 +629,7 @@ export default {
       editedIndex: -1,
       disabled: false,
       U_Tipo_ID: "",
-      maskRNCCedula:""
+      maskRNCCedula: "",
     };
   },
   created() {
@@ -663,19 +673,19 @@ export default {
         this.setInventoryStock();
       },
     },
-    U_Tipo_ID:{
-      handler: function(newValue){
+    U_Tipo_ID: {
+      handler: function (newValue) {
         if (newValue == "" || newValue == undefined) return;
         this.bpModel.U_Tipo_ID = newValue;
-        if(newValue ==1){
-          this.maskRNCCedula = '#########'
-        }else if(newValue == 2){
-          this.maskRNCCedula = '###########'
-        }else{
-          this.maskRNCCedula = null
+        if (newValue == 1) {
+          this.maskRNCCedula = "#########";
+        } else if (newValue == 2) {
+          this.maskRNCCedula = "###########";
+        } else {
+          this.maskRNCCedula = null;
         }
-      }
-    }
+      },
+    },
   },
   methods: {
     async loadQuote() {
@@ -821,10 +831,12 @@ export default {
       let querySnapshot = await this.getDataFromFirebase(requestData, "OSLP");
 
       querySnapshot.forEach((doc) => {
-        this.salesPersons.push({
-          SlpCode: doc.data().SlpCode,
-          SlpName: doc.data().SlpName,
-        });
+        if (doc.data().Active == "Y") {
+          this.salesPersons.push({
+            SlpCode: doc.data().SlpCode,
+            SlpName: doc.data().SlpName,
+          });
+        }
       });
     },
 
@@ -1099,11 +1111,10 @@ export default {
       });
     },
 
-    validateRNCCedula(){
-console.log("Validar")
-return '###'
+    validateRNCCedula() {
+      console.log("Validar");
+      return "###";
     },
-
   },
 };
 </script>
