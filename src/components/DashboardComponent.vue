@@ -512,10 +512,12 @@ export default {
       let querySnapshot = await this.getDataFromFirebase(requestData, "OSLP");
 
       querySnapshot.forEach((doc) => {
-        this.salesPersons.push({
-          SlpCode: doc.data().SlpCode,
-          SlpName: doc.data().SlpName,
-        });
+        if (doc.data().Active == "Y") {
+          this.salesPersons.push({
+            SlpCode: doc.data().SlpCode,
+            SlpName: doc.data().SlpName,
+          });
+        }
       });
     },
 
