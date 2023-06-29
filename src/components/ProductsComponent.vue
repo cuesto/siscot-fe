@@ -124,6 +124,11 @@ export default {
                 value: "Exhibicion_Punta_Cana",
             },
             {
+                text: "Total",
+                sortable: false,
+                value: "Total",
+            },
+            {
                 text: "Opciones",
                 value: "actions",
                 sortable: false,
@@ -183,6 +188,14 @@ export default {
                     Punta_Cana: doc.data().Punta_Cana,
                     Exhibicion_Punta_Cana: doc.data().Exhibicion_Punta_Cana,
                     Exhibicion_Alameda: doc.data().Exhibicion_Alameda,
+                    Total: doc.data().Castellana +
+                        doc.data().Exhibicion_Castellana +
+                        doc.data().Alameda +
+                        doc.data().Santiago +
+                        doc.data().Exhibicion_Santiago +
+                        doc.data().Punta_Cana +
+                        doc.data().Exhibicion_Punta_Cana +
+                        doc.data().Exhibicion_Alameda,
                 });
             });
             this.loadingtable = false;
