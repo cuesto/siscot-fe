@@ -27,9 +27,9 @@
                     <v-spacer></v-spacer>
                 </v-toolbar>
             </template>
-            <template #[`item.actions`]="{ item }">
+            <!-- <template #[`item.actions`]="{ item }">
                 <v-icon size="sm" variant="outline-info" color="blue" class="mr-1" @click="viewItem(item)">mdi-eye</v-icon>
-            </template>
+            </template> -->
             <template v-slot:no-data>
                 <v-btn color="primary" @click="getProducts(true)">
                     <v-icon left dark>autorenew</v-icon>Refrescar
@@ -128,11 +128,11 @@ export default {
                 sortable: false,
                 value: "Total",
             },
-            {
-                text: "Opciones",
-                value: "actions",
-                sortable: false,
-            },
+            // {
+            //     text: "Opciones",
+            //     value: "actions",
+            //     sortable: false,
+            // },
         ],
         search: "",
         loadingtable: false,
