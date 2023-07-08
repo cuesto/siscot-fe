@@ -630,6 +630,7 @@ export default {
       disabled: false,
       U_Tipo_ID: "",
       maskRNCCedula: "",
+      uid: "",
     };
   },
   created() {
@@ -644,7 +645,7 @@ export default {
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        this.getUserData(user.uid);
+        this.uid = user.uid;
       }
     });
 
@@ -704,16 +705,6 @@ export default {
       let disable = this.$route.params.disabled;
       if (disable != undefined) {
         this.disabled = disable;
-      }
-    },
-
-    async getUserData(uid) {
-      const userRef = doc(db, "profiles", uid);
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists()) {
-        this.url = userSnap.data().server;
-      } else {
-        console.log("No such document!");
       }
     },
 
@@ -1050,6 +1041,7 @@ export default {
         this.quotationModel.U_Tipo_NCF = bp.U_Tipo_NCF;
         this.quotationModel.U_RNC_Ced = bp.FederalTaxID;
         this.quotationModel.Indicator = bp.Indicator;
+        this.quotationModel.CreatedBy = this.uid;
 
         let q;
 
