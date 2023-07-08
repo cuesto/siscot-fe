@@ -605,7 +605,6 @@ export default {
         })
         .then((result) => {
           if (result.value) {
-            console.log(item.Id);
             this.deleteItem(item.Id);
             this.getQuotes(true);
           }

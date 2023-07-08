@@ -861,8 +861,9 @@ export default {
 
     setInventoryStock() {
       let item = this.getCurrentItem();
+
       this.warehouses.map((whs) => {
-        whs.displayAutoComplete = whs.WhsName + " - " + item[whs.WhsName];
+        whs.displayAutoComplete = whs.WhsName + " - " + (item[whs.WhsName]==undefined?0:item[whs.WhsName]);
         return whs;
       });
     },
