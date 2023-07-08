@@ -25,6 +25,7 @@
                                     <v-text-field v-model.trim="signupForm.username" label="Usuario" name="username" prepend-icon="person" type="text" :rules="[rules.required]"></v-text-field>
                                     <v-text-field v-model.trim="signupForm.email" label="Email" name="email2" prepend-icon="mail" type="text" :rules="[rules.required, rules.email]"></v-text-field>
                                     <v-text-field v-model.trim="signupForm.password" id="password" label="Contraseña" name="password2" prepend-icon="lock" type="password" :rules="[rules.required]"></v-text-field>
+                                    <v-checkbox label="Es Admin" v-model="signupForm.isAdmin"></v-checkbox>
                                     <v-flex class="red--text" v-if="error">{{ error }}</v-flex>
                                     <v-btn color="primary" @click="signup">Registrar</v-btn>
                                 </v-card-text>
@@ -34,7 +35,7 @@
                     <v-spacer></v-spacer>
                 </v-toolbar>
             </template>
-            <template #[`item.actions`]="{ item }">
+           <template #[`item.actions`]="{ item }">
                 <v-icon size="sm" color="red" class="mr-1" @click="deleteUser(item)">delete</v-icon>
             </template>
             <template v-slot:no-data>
@@ -78,14 +79,15 @@ export default {
             username: "",
             email: "",
             password: "",
+            isAdmin: false,
         },
         rules: {
             required: (value) => !!value || "Requerido.",
             email: (value) => {
-                    const pattern =
-                        /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-                    return pattern.test(value) || "Correo Inválido.";
-                },
+                const pattern =
+                    /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+                return pattern.test(value) || "Correo Inválido.";
+            },
         },
         headers: [{
                 text: "Usuario",
@@ -101,6 +103,12 @@ export default {
                 text: "Email",
                 sortable: false,
                 value: "email",
+            },
+            {
+                text: "Es Admin",
+                sortable: false,
+                value: "isAdmin",
+                key: 'isAdmin'
             },
             {
                 text: "Opciones",
@@ -120,6 +128,7 @@ export default {
                     username: "",
                     email: "",
                     password: "",
+                    isAdmin: false,
                 };
                 this.$refs.formUser.resetValidation();
             }
@@ -155,6 +164,7 @@ export default {
                     username: doc.data().username,
                     name: doc.data().name,
                     email: doc.data().email,
+                    isAdmin: doc.data().isAdmin,
                 });
             });
             this.loadingtable = false;
@@ -175,6 +185,7 @@ export default {
                             name: this.signupForm.name,
                             email: this.signupForm.email,
                             username: this.signupForm.username,
+                            isAdmin: this.signupForm.isAdmin,
                         })
                         .then(() => {
                             console.log("se creo el profile");
