@@ -107,7 +107,6 @@ export default {
         async logout() {
             signOut(auth)
                 .then(() => {
-                    console.log("se deslogueo");
                 })
                 .catch((error) => {
                     console.log(error);
@@ -119,7 +118,6 @@ export default {
             getDoc(docRef)
                 .then((docSnap) => {
                     this.isAdmin = docSnap.data().isAdmin;
-                    console.log("sdfds" + this.isAdmin);
                 })
                 .catch((error) => {
                     console.error("Error getting document:", error);
