@@ -59,7 +59,8 @@ import {
     getFirestore,
     doc,
     setDoc,
-    collection
+    getDoc,
+    collection,
 } from "firebase/firestore";
 const auth = getAuth();
 const db = getFirestore(firebaseApp);
@@ -98,7 +99,7 @@ export default {
             this.showLoginForm = !this.showLoginForm;
         },
 
-        async login() {
+       async login() {
             const auth = getAuth();
             signInWithEmailAndPassword(
                     auth,
@@ -107,6 +108,15 @@ export default {
                 )
                 .then((userCredential) => {
                     // Signed in
+                    const user = userCredential.user;
+                    const docRef = doc(db, "profiles", user.uid);
+                    getDoc(docRef)
+                        .then((docSnap) => {
+                            const isAdmin = docSnap.data().isAdmin;
+                        })
+                        .catch((error) => {
+                            console.error("Error getting document:", error);
+                        });
                 })
                 .catch((error) => {
                     const errorCode = error.code;

@@ -16,19 +16,19 @@
                         </v-list-item-icon>
                         <v-list-item-title>Cotizaciones</v-list-item-title>
                     </v-list-item>
-                    <v-list-item :to="{name: 'products'}">
+                    <v-list-item :to="{ name: 'products' }">
                         <v-list-item-icon>
                             <v-icon>mdi-package-variant-closed</v-icon>
                         </v-list-item-icon>
                         <v-list-item-title>Productos</v-list-item-title>
                     </v-list-item>
-                    <v-list-group :value="false" prepend-icon="settings" no-action>
+                    <v-list-group :value="false" v-if="isAdmin" prepend-icon="settings" no-action>
                         <template v-slot:activator>
                             <v-list-item-content>
                                 <v-list-item-title>Configuración</v-list-item-title>
                             </v-list-item-content>
                         </template>
-                        <v-list-item :to="{name: 'users'}">
+                        <v-list-item :to="{ name: 'users' }">
                             <v-list-item-icon>
                                 <v-icon>mdi-account-multiple</v-icon>
                             </v-list-item-icon>
@@ -67,7 +67,6 @@
 </v-app>
 </template>
 
-  
 <script>
 import router from "./router/index"; // If line is not here the system crash when refresh de page
 import {
@@ -75,19 +74,30 @@ import {
     onAuthStateChanged,
     signOut
 } from "firebase/auth";
+import {
+    firebaseApp
+} from "./firebase";
+import {
+    getFirestore,
+    doc,
+    getDoc,
+} from "firebase/firestore";
 
 const auth = getAuth();
+const db = getFirestore(firebaseApp);
 
 export default {
     data: () => ({
         drawer: true,
         isLoggedIn: false,
         group: null,
+        isAdmin: false,
     }),
     created() {
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 this.isLoggedIn = true;
+                this.checkAdmin(user.uid);
             } else {
                 this.isLoggedIn = false;
             }
@@ -101,6 +111,18 @@ export default {
                 })
                 .catch((error) => {
                     console.log(error);
+                });
+        },
+
+        async checkAdmin(uid) {
+            const docRef = doc(db, "profiles", uid);
+            getDoc(docRef)
+                .then((docSnap) => {
+                    this.isAdmin = docSnap.data().isAdmin;
+                    console.log("sdfds" + this.isAdmin);
+                })
+                .catch((error) => {
+                    console.error("Error getting document:", error);
                 });
         },
     },
