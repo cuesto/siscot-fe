@@ -302,6 +302,7 @@
 import router from "../router";
 import InvoicePrint from "../components/InvoicePrintComponent.vue";
 import { firebaseApp } from "../firebase";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {
   getFirestore,
   doc,
@@ -313,6 +314,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
+const auth = getAuth();
 const db = getFirestore(firebaseApp);
 const quotationRef = collection(db, "OQUT");
 
@@ -442,13 +444,20 @@ export default {
         return pattern.test(value) || "Correo Inválido.";
       },
     },
+    uid: "",
   }),
   mounted() {
-    this.getQuotes(true);
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        this.uid = user.uid;
+      }
+    });
+
     this.getIndicators(true);
     this.getSalesPersons(true);
     this.getTransports(true);
     this.getPaymentGroups(true);
+    this.getQuotes(true);
   },
 
   methods: {
@@ -489,8 +498,19 @@ export default {
           IsTransfered: doc.data().IsTransfered,
           IsSalesOrder: doc.data().IsSalesOrder,
           Total: doc.data().Total,
+          CreatedBy: doc.data().CreatedBy,
         });
       });
+      const newArray = [];
+
+      for (const element of this.quotes) {
+        if (element.CreatedBy === this.uid) {
+          newArray.push(element);
+        }
+      }
+
+      this.quotes = [];
+      this.quotes = newArray;
       this.loadingQT = false;
     },
 
