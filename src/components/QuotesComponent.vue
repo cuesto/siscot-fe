@@ -1022,12 +1022,6 @@ export default {
     onDecode(a, b, c) {
       this.ItemCode = a;
       this.dialogqr = false;
-      if (this.id) clearTimeout(this.id);
-      this.id = setTimeout(() => {
-        if (this.ItemCode === a) {
-          this.ItemCode = "";
-        }
-      }, 5000);
     },
 
     onLoaded() {},
