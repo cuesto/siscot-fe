@@ -85,47 +85,47 @@ export default {
             },
             {
                 text: "Castellana",
-                sortable: false,
+                sortable: true,
                 value: "Castellana",
             },
             {
                 text: "Exhibición Castellana",
-                sortable: false,
+                sortable: true,
                 value: "Exhibicion_Castellana",
             },
             {
                 text: "Alameda",
-                sortable: false,
+                sortable: true,
                 value: "Alameda",
             },
             {
                 text: "Exhibición Alameda",
-                sortable: false,
+                sortable: true,
                 value: "Exhibicion_Alameda",
             },
             {
                 text: "Santiago",
-                sortable: false,
+                sortable: true,
                 value: "Santiago",
             },
             {
                 text: "Exhibición Santiago",
-                sortable: false,
+                sortable: true,
                 value: "Exhibicion_Santiago",
             },
             {
                 text: "Punta Cana",
-                sortable: false,
+                sortable: true,
                 value: "Punta_Cana",
             },
             {
                 text: "Exhibición Punta Cana",
-                sortable: false,
+                sortable: true,
                 value: "Exhibicion_Punta_Cana",
             },
             {
                 text: "Total",
-                sortable: false,
+                sortable: true,
                 value: "Total",
             },
             // {
