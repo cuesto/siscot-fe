@@ -510,7 +510,9 @@ export default {
       }
 
       this.quotes = [];
-      this.quotes = newArray;
+      this.quotes = newArray.sort((a, b) => {
+        return new Date(b.DocDate) - new Date(a.DocDate);
+      }); 
       this.loadingQT = false;
     },
 
